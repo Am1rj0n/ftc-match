@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Predictor - FTC Match</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="phase2">
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline>
+                    </svg>
+                    <h1>Match Predictor</h1>
+                </div>
+                <p class="subtitle">Predict Match Outcomes with Advanced Analysis</p>
+                <p class="phase-label">Phase 2: Match-Specific Predictions</p>
+            </div>
+        </header>
+
+        <!-- Alliance Input Panel -->
+        <section class="input-panel">
+            <h2 class="section-title">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Your Alliance
+            </h2>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="yourTeam1">Your Team 1</label>
+                    <input type="number" id="yourTeam1" placeholder="e.g., 10392">
+                </div>
+                
+                <div class="input-group">
+                    <label for="yourTeam2">Your Team 2</label>
+                    <input type="number" id="yourTeam2" placeholder="e.g., 3371">
+                </div>
+            </div>
+        </section>
+
+        <!-- Opponent Alliance Input -->
+        <section class="input-panel">
+            <h2 class="section-title">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Opponent Alliance
+            </h2>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="oppTeam1">Opponent Team 1</label>
+                    <input type="number" id="oppTeam1" placeholder="e.g., 10393">
+                </div>
+                
+                <div class="input-group">
+                    <label for="oppTeam2">Opponent Team 2</label>
+                    <input type="number" id="oppTeam2" placeholder="e.g., 8087">
+                </div>
+            </div>
+
+            <button id="predictBtn" class="btn-primary">
+                <span id="btnText">Predict Match Outcome</span>
+                <div id="btnLoader" class="loader hidden"></div>
+            </button>
+        </section>
+
+        <!-- Error Display -->
+        <div id="errorPanel" class="error-panel hidden">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <div>
+                <p class="error-title">Error</p>
+                <p id="errorMessage" class="error-message"></p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <!-- Win Probability Card -->
+            <div class="win-prob-card">
+                <h3>Match Prediction</h3>
+                <div class="win-prob-display">
+                    <div class="alliance-prob your-alliance">
+                        <div class="alliance-label">Your Alliance</div>
+                        <div class="prob-value" id="yourWinProb">--</div>
+                        <div class="prob-label">Win Probability</div>
+                    </div>
+                    <div class="vs-divider">VS</div>
+                    <div class="alliance-prob opp-alliance">
+                        <div class="alliance-label">Opponent Alliance</div>
+                        <div class="prob-value" id="oppWinProb">--</div>
+                        <div class="prob-label">Win Probability</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expected Scores -->
+            <div class="comparison-grid">
+                <div class="comparison-card your-card">
+                    <h3>Your Alliance Expected Score</h3>
+                    <div class="score-display">
+                        <div class="score-main" id="yourExpectedScore">--</div>
+                        <div class="score-range">Range: <span id="yourScoreRange">--</span></div>
+                    </div>
+                    <div class="team-breakdown">
+                        <h4>Team Breakdown</h4>
+                        <div class="breakdown-item">
+                            <span id="yourTeam1Name">Team 1</span>
+                            <span id="yourTeam1OPR">--</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span id="yourTeam2Name">Team 2</span>
+                            <span id="yourTeam2OPR">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card opp-card">
+                    <h3>Opponent Expected Score</h3>
+                    <div class="score-display">
+                        <div class="score-main" id="oppExpectedScore">--</div>
+                        <div class="score-range">Range: <span id="oppScoreRange">--</span></div>
+                    </div>
+                    <div class="team-breakdown">
+                        <h4>Team Breakdown</h4>
+                        <div class="breakdown-item">
+                            <span id="oppTeam1Name">Team 1</span>
+                            <span id="oppTeam1OPR">--</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span id="oppTeam2Name">Team 2</span>
+                            <span id="oppTeam2OPR">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score Distribution Chart -->
+            <div class="chart-panel">
+                <h3 class="section-title">Score Distribution Comparison</h3>
+                <canvas id="comparisonChart"></canvas>
+            </div>
+
+            <!-- Key Insights -->
+            <div class="insights-panel">
+                <h3 class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    Key Insights
+                </h3>
+                <div id="insightsContent" class="insights-content"></div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                <p>
+                    <strong>Note:</strong> Predictions are based on historical OPR data and Monte Carlo simulations. 
+                    Actual match outcomes can vary due to strategy, defense, field conditions, driver skill, and other factors.
+                    Use as one data point in your match preparation.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="creator-credit">Created by <strong>Amirjon Sadikov</strong> • Member of <strong>Rolling Drones #10392</strong></p>
+            <p>Data provided by <a href="https://ftcscout.org" target="_blank">FTCScout</a></p>
+            <p>FIRST Tech Challenge® is a registered trademark of <a href="https://www.firstinspires.org" target="_blank">FIRST</a></p>
+            <p class="footer-small">Educational tool • Non-commercial use • Phase 2</p>
+        </footer>
+    </div>
+
+    <script src="nav.js"></script>
+    <script src="match-predictor.js"></script>
+</body>
+</html>

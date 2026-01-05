@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alliance Simulator - FTC Match</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="phase1">
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                    <h1>FTC Alliance Simulator</h1>
+                </div>
+                <p class="subtitle">Monte Carlo Analysis for DECODE (2025-2026)</p>
+                <p class="phase-label">Phase 1: Educational Tool • Non-Commercial Use Only</p>
+            </div>
+        </header>
+
+        <!-- Input Panel -->
+        <section class="input-panel">
+            <h2 class="section-title">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                Alliance Configuration
+            </h2>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="team1">Team 1 Number</label>
+                    <input type="number" id="team1" placeholder="e.g., 12345">
+                </div>
+                
+                <div class="input-group">
+                    <label for="team2">Team 2 Number</label>
+                    <input type="number" id="team2" placeholder="e.g., 67890">
+                </div>
+                
+                <div class="input-group">
+                    <label for="targetScore">Target Score (optional)</label>
+                    <input type="number" id="targetScore" placeholder="e.g., 200" value="200">
+                </div>
+            </div>
+
+            <button id="simulateBtn" class="btn-primary">
+                <span id="btnText">Run Monte Carlo Simulation</span>
+                <div id="btnLoader" class="loader hidden"></div>
+            </button>
+        </section>
+
+        <!-- Error Display -->
+        <div id="errorPanel" class="error-panel hidden">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <div>
+                <p class="error-title">Error</p>
+                <p id="errorMessage" class="error-message"></p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <!-- Team Info Cards -->
+            <div class="team-grid">
+                <div class="team-card">
+                    <h3 class="team-title" id="team1Title">Team Loading...</h3>
+                    <p class="team-name" id="team1Name"></p>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Auto OPR:</span>
+                            <span class="stat-value" id="team1Auto">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">TeleOp OPR:</span>
+                            <span class="stat-value" id="team1Teleop">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Endgame OPR:</span>
+                            <span class="stat-value" id="team1Endgame">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total OPR:</span>
+                            <span class="stat-value" id="team1Total">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <h3 class="team-title" id="team2Title">Team Loading...</h3>
+                    <p class="team-name" id="team2Name"></p>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Auto OPR:</span>
+                            <span class="stat-value" id="team2Auto">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">TeleOp OPR:</span>
+                            <span class="stat-value" id="team2Teleop">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Endgame OPR:</span>
+                            <span class="stat-value" id="team2Endgame">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total OPR:</span>
+                            <span class="stat-value" id="team2Total">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card metric-blue">
+                    <div class="metric-header">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        <p class="metric-label">Expected Score</p>
+                    </div>
+                    <p class="metric-value" id="meanScore">-</p>
+                    <p class="metric-subtitle">Mean alliance score</p>
+                </div>
+
+                <div class="metric-card metric-purple">
+                    <div class="metric-header">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                        </svg>
+                        <p class="metric-label">Consistency</p>
+                    </div>
+                    <p class="metric-value" id="stdDev">-</p>
+                    <p class="metric-subtitle">Standard deviation</p>
+                </div>
+
+                <div class="metric-card metric-green">
+                    <div class="metric-header">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <p class="metric-label">Win Probability</p>
+                    </div>
+                    <p class="metric-value" id="winProb">-</p>
+                    <p class="metric-subtitle" id="winProbSubtitle">vs target 200</p>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-panel">
+                <h3 class="section-title">Score Distribution (10,000 simulations)</h3>
+                <canvas id="histogramChart"></canvas>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                <p>
+                    <strong>Note:</strong> These are probabilistic estimates based on historical OPR data. 
+                    Actual match performance varies due to strategy, defense, field conditions, and other factors.
+                    Use this tool as one input among many for alliance selection decisions.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="creator-credit">Created by <strong>Amirjon Sadikov</strong> • Member of <strong>Rolling Drones #10392</strong></p>
+            <p>Data provided by <a href="https://ftcscout.org" target="_blank">FTCScout</a></p>
+            <p>FIRST Tech Challenge® is a registered trademark of <a href="https://www.firstinspires.org" target="_blank">FIRST</a></p>
+            <p class="footer-small">Educational tool • Non-commercial use • Phase 1 prototype</p>
+        </footer>
+    </div>
+
+    <script src="nav.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

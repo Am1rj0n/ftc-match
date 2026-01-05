@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pick List Builder - FTC Match</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="phase3">
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                    <h1>Pick List Builder</h1>
+                </div>
+                <p class="subtitle">Strategic Alliance Selection Tool</p>
+                <p class="phase-label">Phase 3: Intelligent Team Ranking</p>
+            </div>
+        </header>
+
+        <!-- Event Selection -->
+        <section class="input-panel">
+            <h2 class="section-title">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Select Event
+            </h2>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="eventCode">Event Code</label>
+                    <input type="text" id="eventCode" placeholder="USNYNYBRQ2" 
+                           title="Enter event code like USNYNYBRQ2">
+                </div>
+                
+                <div class="input-group">
+                    <label for="yourTeamNumber">Your Team (Optional)</label>
+                    <input type="number" id="yourTeamNumber" placeholder="10392">
+                </div>
+            </div>
+
+            <button id="loadEventBtn" class="btn-primary">
+                <span id="loadBtnText">Load Event & Generate Pick List</span>
+                <div id="loadBtnLoader" class="loader hidden"></div>
+            </button>
+        </section>
+
+        <!-- Error Display -->
+        <div id="errorPanel" class="error-panel hidden">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <div>
+                <p class="error-title">Error</p>
+                <p id="errorMessage" class="error-message"></p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <!-- Event Info -->
+            <div class="event-info-card">
+                <h3 id="eventName">Event Name</h3>
+                <p id="eventCode2" class="event-code">Code: --</p>
+                <p id="teamCount" class="team-count">-- teams competing</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-panel">
+                <h3 class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    Filter & Sort
+                </h3>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="sortBy">Sort By</label>
+                        <select id="sortBy" class="filter-select">
+                            <option value="pickScore">Pick Score (Recommended)</option>
+                            <option value="opr">Total OPR</option>
+                            <option value="consistency">Consistency</option>
+                            <option value="autoOPR">Auto OPR</option>
+                            <option value="dcOPR">TeleOp OPR</option>
+                            <option value="winRate">Win Rate</option>
+                            <option value="rank">Event Rank</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="minOPR">Min Total OPR</label>
+                        <input type="number" id="minOPR" class="filter-input" placeholder="0">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="strengthFilter">Strength Focus</label>
+                        <select id="strengthFilter" class="filter-select">
+                            <option value="all">All Teams</option>
+                            <option value="auto">Auto Specialists</option>
+                            <option value="teleop">TeleOp Specialists</option>
+                            <option value="consistent">Consistent Performers</option>
+                        </select>
+                    </div>
+
+                    <button id="applyFilters" class="btn-secondary">Apply Filters</button>
+                </div>
+            </div>
+
+            <!-- Pick List Table -->
+            <div class="pick-list-panel">
+                <div class="pick-list-header">
+                    <h3 class="section-title">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                        Alliance Selection Pick List
+                    </h3>
+                    <button id="exportBtn" class="btn-secondary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export List
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="pick-list-table" id="pickListTable">
+                        <thead>
+                            <tr>
+                                <th>Pick #</th>
+                                <th>Team</th>
+                                <th>Rank</th>
+                                <th>Pick Score</th>
+                                <th>Total OPR</th>
+                                <th>Auto</th>
+                                <th>TeleOp</th>
+                                <th>W-L-T</th>
+                                <th>Consistency</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pickListBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend-panel">
+                <h4>📊 Metrics Explained</h4>
+                <div class="legend-grid">
+                    <div class="legend-item">
+                        <strong>Pick Score:</strong> Overall ranking combining OPR, consistency, win rate, and complementary fit with your team
+                    </div>
+                    <div class="legend-item">
+                        <strong>Consistency:</strong> Lower values = more predictable. Teams with low std deviation are reliable
+                    </div>
+                    <div class="legend-item">
+                        <strong>Complementary:</strong> Bonus points if team fills gaps in YOUR team's capabilities (auto/teleop)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="creator-credit">Created by <strong>Amirjon Sadikov</strong> • Member of <strong>Rolling Drones #10392</strong></p>
+            <p>Data provided by <a href="https://ftcscout.org" target="_blank">FTCScout</a></p>
+            <p>FIRST Tech Challenge® is a registered trademark of <a href="https://www.firstinspires.org" target="_blank">FIRST</a></p>
+            <p class="footer-small">Educational tool • Non-commercial use • Phase 3</p>
+        </footer>
+    </div>
+
+    <script src="nav.js"></script>
+    <script src="pick-list.js"></script>
+</body>
+</html>

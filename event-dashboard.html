@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Event Dashboard - FTC Match</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="phase4">
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                    <h1>Live Event Dashboard</h1>
+                </div>
+                <p class="subtitle">Real-Time Competition Analysis</p>
+                <p class="phase-label">Phase 4: Event-Specific Intelligence</p>
+            </div>
+        </header>
+
+        <!-- Event Search -->
+        <section class="input-panel">
+            <h2 class="section-title">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                Find Events
+            </h2>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="eventCodeSearch">Event Code</label>
+                    <input type="text" id="eventCodeSearch" placeholder="USNYNYBRQ2">
+                </div>
+                
+                <div class="input-group">
+                    <label for="seasonSelect">Season</label>
+                    <select id="seasonSelect" class="filter-select">
+                        <option value="2025">2025-2026 (DECODE)</option>
+                        <option value="2024">2024-2025 (INTO THE DEEP)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button id="loadEventBtn" class="btn-primary">
+                <span id="loadBtnText">Load Event</span>
+                <div id="loadBtnLoader" class="loader hidden"></div>
+            </button>
+        </section>
+
+        <!-- Error Display -->
+        <div id="errorPanel" class="error-panel hidden">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <div>
+                <p class="error-title">Error</p>
+                <p id="errorMessage" class="error-message"></p>
+            </div>
+        </div>
+
+        <!-- Event Dashboard -->
+        <div id="dashboardSection" class="hidden">
+            <!-- Event Header -->
+            <div class="event-header-card">
+                <div class="event-header-content">
+                    <h2 id="dashEventName">Event Name</h2>
+                    <div class="event-meta">
+                        <span id="dashEventDates" class="event-date"></span>
+                        <span id="dashEventLocation" class="event-location"></span>
+                        <span id="dashEventStatus" class="event-status-badge"></span>
+                    </div>
+                </div>
+                <button id="changeEventBtn" class="btn-secondary">Change Event</button>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🏅</div>
+                    <div class="stat-value" id="totalTeams">-</div>
+                    <div class="stat-label">Teams Competing</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value" id="avgOPR">-</div>
+                    <div class="stat-label">Average OPR</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value" id="topOPR">-</div>
+                    <div class="stat-label">Highest OPR</div>
+                </div>
+            </div>
+
+            <!-- Alliance Simulator -->
+            <section class="input-panel">
+                <h2 class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Alliance Simulator (Event Stats)
+                </h2>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="simTeam1">Team 1</label>
+                        <input type="number" id="simTeam1" placeholder="Team number">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="simTeam2">Team 2</label>
+                        <input type="number" id="simTeam2" placeholder="Team number">
+                    </div>
+                </div>
+
+                <button id="simulateAllianceBtn" class="btn-primary">
+                    <span id="simBtnText">Simulate Alliance at This Event</span>
+                    <div id="simBtnLoader" class="loader hidden"></div>
+                </button>
+            </section>
+
+            <!-- Simulation Results -->
+            <div id="simResultsSection" class="hidden">
+                <div class="alliance-result-card">
+                    <h3>Alliance Performance Prediction</h3>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">Expected Score</div>
+                            <div class="result-value" id="allianceScore">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Consistency</div>
+                            <div class="result-value" id="allianceConsistency">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Event Rank Projection</div>
+                            <div class="result-value" id="rankProjection">-</div>
+                        </div>
+                    </div>
+                    <canvas id="eventScoresChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Teams at Event -->
+            <div class="rankings-panel">
+                <h3 class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="12" y1="20" x2="12" y2="10"></line>
+                        <line x1="18" y1="20" x2="18" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="16"></line>
+                    </svg>
+                    Top 10 Teams at Event
+                </h3>
+                <div class="table-container">
+                    <table class="rankings-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Team</th>
+                                <th>OPR</th>
+                                <th>Record</th>
+                                <th>RP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingsBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="creator-credit">Created by <strong>Amirjon Sadikov</strong> • Member of <strong>Rolling Drones #10392</strong></p>
+            <p>Data provided by <a href="https://ftcscout.org" target="_blank">FTCScout</a></p>
+            <p>FIRST Tech Challenge® is a registered trademark of <a href="https://www.firstinspires.org" target="_blank">FIRST</a></p>
+            <p class="footer-small">Educational tool • Non-commercial use • Phase 4</p>
+        </footer>
+    </div>
+
+    <script src="nav.js"></script>
+    <script src="event-dashboard.js"></script>
+</body>
+</html>
