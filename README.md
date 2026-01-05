@@ -1,4 +1,4 @@
-# 🤖 FTC Match Analysis Toolkit
+#  FTC Match Analysis Toolkit
 
 **Created by Amirjon Sadikov • Rolling Drones #10392**
 
@@ -6,7 +6,7 @@ A  suite of tools designed to help FIRST Tech Challenge teams make data driven s
 
 ---
 
-## 🎯 What This Does
+## What This Does
 
 This toolkit helps your team:
 - **Predict alliance performance** before matches using Monte Carlo simulations
@@ -18,7 +18,7 @@ All analysis runs **live in your browser** - no server setup required!
 
 ---
 
-## 🚀 Features
+## Features
 
 ### 1️⃣ Alliance Simulator
 Simulate how two teams will perform together using Monte Carlo analysis.
@@ -42,7 +42,7 @@ Simulate how two teams will perform together using Monte Carlo analysis.
 
 ---
 
-### 2️⃣ Match Predictor
+###  Match Predictor
 Compare your alliance vs opponents before a match.
 
 **What it does:**
@@ -64,7 +64,7 @@ Compare your alliance vs opponents before a match.
 
 ---
 
-### 3️⃣ Pick List Builder
+### Pick List Builder
 Generate intelligent pick lists for alliance selection.
 
 **What it does:**
@@ -92,7 +92,7 @@ Generate intelligent pick lists for alliance selection.
 
 ---
 
-## 📊 Understanding the Metrics
+## Understanding the Metrics
 
 ### **OPR (Offensive Power Rating)**
 - **Total OPR**: Overall contribution to alliance score
@@ -117,7 +117,7 @@ Generate intelligent pick lists for alliance selection.
 
 ---
 
-## 🔧 Technical Details
+## Technical Details
 
 ### **Data Source**
 All team statistics come from [FTC Scout](https://ftcscout.org) via their GraphQL API.
@@ -136,7 +136,7 @@ Uses Monte Carlo simulation with Gaussian (normal) distribution:
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 **"Team not found" error:**
 - Check team number is correct
@@ -159,7 +159,7 @@ Uses Monte Carlo simulation with Gaussian (normal) distribution:
 
 ---
 
-## 📝 Changelog
+##  Changelog
 
 **Version 1.3 (Current)**
 - Removed Event Dashboard (simplified toolkit)
@@ -184,7 +184,7 @@ Uses Monte Carlo simulation with Gaussian (normal) distribution:
 
 ---
 
-## 🤝 Contributing & Feedback
+##  Contributing & Feedback
 
 This is a living project! Ideas for improvement:
 - Additional statistical models
@@ -195,7 +195,7 @@ This is a living project! Ideas for improvement:
 
 ---
 
-## 📜 License & Credits
+##  License & Credits
 
 **Educational Use Only** • Non-Commercial
 
@@ -210,7 +210,7 @@ Built with Gracious Professionalism® and Coopertition™
 
 ---
 
-## 🎓 Learning Resources
+##  Learning Resources
 
 Want to understand the math and code?
 
@@ -230,7 +230,7 @@ Want to understand the math and code?
 
 ---
 
-## 💡 Tips for Your Team
+##  Tips for Your Team
 
 ### **Before the Event:**
 1. Research opponent OPRs from their previous competitions
