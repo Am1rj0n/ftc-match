@@ -98,7 +98,7 @@ Generate intelligent pick lists for alliance selection.
 - **Total OPR**: Overall contribution to alliance score
 - **Auto OPR**: Points contributed during autonomous
 - **TeleOp OPR**: Points contributed during driver-controlled period
-- **Endgame OPR**: Points from hanging/parking
+- **Endgame OPR**: Points from parking
 
 ### **Consistency (Standard Deviation)**
 - Lower = more predictable performance
@@ -126,7 +126,7 @@ All team statistics come from [FTC Scout](https://ftcscout.org) via their GraphQ
 Uses Monte Carlo simulation with Gaussian (normal) distribution:
 - Each game phase (auto/teleop/endgame) has ±20% variance
 - 10,000 iterations per simulation for statistical accuracy
-- Box-Muller transform for random number generation
+- Box-Muller transform for random number generation 
 
 ### **Privacy & Ethics**
 - All data is publicly available through FTC Scout
@@ -225,8 +225,8 @@ Want to understand the math and code?
 - [Box-Muller Transform](https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform)
 
 **FTC Strategy:**
-- [OPR Explained](https://www.chiefdelphi.com/t/opr-ccwm-and-dpr-equations/162765)
-- [FTC Scout Documentation](https://ftcscout.org/api/docs)
+- [OPR Explained](https://blog.thebluealliance.com/2017/10/05/the-math-behind-opr-an-introduction/)
+- [FTC Scout API](https://ftcscout.org)
 
 ---
 
