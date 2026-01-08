@@ -1,6 +1,6 @@
 #  FTC Match Analysis Toolkit
 
-**Created by Amirjon Sadikov • Rolling Drones #10392**
+**Created by Rolling Drones #10392**
 
 A  suite of tools designed to help FIRST Tech Challenge teams make data driven strategic decisions during competitions. Built for the 2025-2026 DECODE season.
 
