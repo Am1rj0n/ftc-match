@@ -70,25 +70,45 @@ Generate intelligent pick lists for alliance selection.
 **What it does:**
 - Loads all teams from a specific event
 - Ranks teams using a composite "Pick Score" algorithm
+- Calculates Complementary Fit based on gaps in your team’s auto/teleop
+- Computes Win Probability by simulating matches against all possible alliances (default 500 simulations per combination)
+- Computes Event Win % by simulating a full playoffs tournament to the end for each potential pick (not reflected in pick score)
 - Filters by OPR, consistency, and specialties
 - Exports to CSV for team discussions
 
 **Pick Score Formula:**
-- 40% Total OPR
-- 40% Simulated Win Probability (with your team)
-- 20% Consistency (lower variance = higher score)
+- 30% Total OPR - Raw team strength
+- 40% Win Probability - % of simulations where the alliance meets or exceeds the dynamic event target score
+- 20% Complementary Fit - How well they fill gaps in your auto/teleop
+- 10% Consistency - Lower variance = more reliable
+
+**Complementary Scoring:**
+-Auto & Teleop gaps are compared between your team and the candidate
+-Bigger gaps where your team is weak = more complementary points
+-Well rounded teams (strong in both auto and teleop) get a bonus
+-Teams below minimum thresholds in OPR are penalized (too weak to be valuable)
+
+
+**Advanced Simulation Features:**
+-Dynamic Target Score per event (adapts to average scores in that event)
+-All-Alliances Monte Carlo: Simulates your alliance against all possible pairings of remaining teams
+-Defense & Failure Modeling: Optional tier 2 improvements include correlated failures and auto/teleop role-based interactions
+-Event Win %: Simulates full playoff tournaments to estimate the likelihood of winning the event if the candidate team is picked
 
 **Best for:**
 - Alliance selection preparation
 - Identifying complementary partners
 - Finding consistent performers vs high-ceiling teams
+- Strategic scouting and data-driven decision making
 
 **How to use:**
 1. Enter event code (e.g., `USNYNYBRQ2`)
-2. Optionally enter your team number for complementary analysis
+2. Optionally enter your team number for proper complementary analysis
 3. Click "Load Event & Generate Pick List"
 4. Use filters to find auto specialists, consistent teams, etc.
 5. Export the list for your team's review
+6. Optionally check the Event Win % column to see which teams increase your chances of winning the event
+
 
 ---
 
