@@ -1,9 +1,10 @@
 /**
- * FTC Picklist Builder - Phase 3 (FTC Scout + Monte Carlo + Smart Complementary Scoring)
+ * FTC Picklist Builder - Phase 4 (Full Tournament Monte Carlo + Event Win %)
  */
 
 // Configuration
 const FTCSCOUT_URL = 'https://api.ftcscout.org/graphql';
+const DEFAULT_MONTE_CARLO_ITER = 500;
 
 // State
 let currentPickList = [];
@@ -24,9 +25,7 @@ loadEventBtn.addEventListener('click', loadEvent);
 if (exportBtn) exportBtn.addEventListener('click', exportPickList);
 if (applyFiltersBtn) applyFiltersBtn.addEventListener('click', applyFiltersAndSort);
 
-/**
- * MATH UTILITIES
- */
+/** ---------------- MATH UTILITIES ---------------- */
 function gaussianRandom() {
     let u = 0, v = 0;
     while(u === 0) u = Math.random();
@@ -34,141 +33,139 @@ function gaussianRandom() {
     return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
-function runMonteCarlo(stats1, stats2, targetScore = 150, iterations = 2000) {
-    let winCount = 0;
-    for (let i = 0; i < iterations; i++) {
-        const score1 = Math.max(0, 
-            stats1.auto * (1 + gaussianRandom() * 0.15) +
-            stats1.teleop * (1 + gaussianRandom() * 0.15)
-        );
-        const score2 = Math.max(0,
-            stats2.auto * (1 + gaussianRandom() * 0.15) +
-            stats2.teleop * (1 + gaussianRandom() * 0.15)
-        );
-        if ((score1 + score2) >= targetScore) winCount++;
-    }
-    return (winCount / iterations) * 100;
-}
-
-/**
- * COMPLEMENTARY SCORING - REDESIGNED!
- * 
- * How it works:
- * 1. Compare YOUR auto/teleop to THEIR auto/teleop directly
- * 2. Bigger gaps where you're weak = more points
- * 3. If they're strong in BOTH = bonus points
- * 4. Must meet minimum thresholds (no weak teams)
- * 
- * Max Score: 100 points (scaled later to 20% of pick score)
- */
+/** ---------------- COMPLEMENTARY SCORING ---------------- */
 function calculateComplementary(yourStats, theirStats) {
     let score = 0;
-    
-    // Safety check
-    if (!yourStats || !theirStats || theirStats.totalOPR === 0) {
-        return 0;
-    }
-    
-    // MINIMUM THRESHOLD: Don't rank weak teams highly
-    if (theirStats.totalOPR < 30) {
-        return 0; // Too weak to be valuable
-    }
-    
-    const yourAuto = yourStats.auto || 0;
-    const yourTeleop = yourStats.teleop || 0;
-    const theirAuto = theirStats.auto || 0;
-    const theirTeleop = theirStats.teleop || 0;
-    
-    // ============================================
-    // AUTO COMPLEMENTARY (Max 40 points)
-    // ============================================
-    const autoGap = theirAuto - yourAuto;
-    
-    if (autoGap > 0 && theirAuto >= 20) { // They're stronger AND meet minimum
-        if (yourAuto < 20) { // You're weak in auto
-            // Big gap = more points
-            if (autoGap >= 30) {
-                score += 40; // Huge complement (e.g., you: 10, them: 40+)
-            } else if (autoGap >= 20) {
-                score += 30; // Strong complement (e.g., you: 15, them: 35+)
-            } else if (autoGap >= 10) {
-                score += 20; // Good complement (e.g., you: 15, them: 25+)
-            } else {
-                score += 10; // Minor complement (e.g., you: 15, them: 20)
-            }
-        } else { // You're already decent in auto
-            // Still give points, but less
-            if (autoGap >= 20) {
-                score += 15; // They're significantly better
-            } else if (autoGap >= 10) {
-                score += 8; // They're moderately better
-            }
-        }
-    }
-    
-    // ============================================
-    // TELEOP COMPLEMENTARY (Max 40 points)
-    // ============================================
-    const teleopGap = theirTeleop - yourTeleop;
-    
-    if (teleopGap > 0 && theirTeleop >= 35) { // They're stronger AND meet minimum
-        if (yourTeleop < 40) { // You're weak in teleop
-            // Big gap = more points
-            if (teleopGap >= 40) {
-                score += 40; // Huge complement (e.g., you: 30, them: 70+)
-            } else if (teleopGap >= 25) {
-                score += 30; // Strong complement (e.g., you: 30, them: 55+)
-            } else if (teleopGap >= 15) {
-                score += 20; // Good complement (e.g., you: 35, them: 50+)
-            } else {
-                score += 10; // Minor complement
-            }
-        } else { // You're already decent in teleop
-            if (teleopGap >= 30) {
-                score += 15; // They're significantly better
-            } else if (teleopGap >= 15) {
-                score += 8; // They're moderately better
-            }
-        }
-    }
-    
-    // ============================================
-    // WELL-ROUNDED BONUS (Max 20 points)
-    // If they're strong in BOTH auto and teleop
-    // ============================================
-    if (theirAuto >= 25 && theirTeleop >= 40) {
-        // Check how much better they are in BOTH
-        const bothBetter = (autoGap > 0 && teleopGap > 0);
-        
-        if (bothBetter) {
-            if (autoGap >= 15 && teleopGap >= 20) {
-                score += 20; // Significantly better at both
-            } else if (autoGap >= 10 && teleopGap >= 15) {
-                score += 15; // Moderately better at both
-            } else if (autoGap >= 5 && teleopGap >= 10) {
-                score += 10; // Somewhat better at both
-            }
+    if (!yourStats || !theirStats || theirStats.totalOPR === 0) return 0;
+    if (theirStats.totalOPR < 30) return 0;
+
+    const autoGap = theirStats.auto - yourStats.auto;
+    const teleopGap = theirStats.teleop - yourStats.teleop;
+
+    // AUTO
+    if (autoGap > 0 && theirStats.auto >= 20) {
+        if (yourStats.auto < 20) {
+            if (autoGap >= 30) score += 40;
+            else if (autoGap >= 20) score += 30;
+            else if (autoGap >= 10) score += 20;
+            else score += 10;
         } else {
-            // They're strong in both, but not necessarily better than you
-            score += 5; // Small bonus for being well-rounded
+            if (autoGap >= 20) score += 15;
+            else if (autoGap >= 10) score += 8;
         }
     }
-    
-    return Math.min(score, 100); // Cap at 100
+
+    // TELEOP
+    if (teleopGap > 0 && theirStats.teleop >= 35) {
+        if (yourStats.teleop < 40) {
+            if (teleopGap >= 40) score += 40;
+            else if (teleopGap >= 25) score += 30;
+            else if (teleopGap >= 15) score += 20;
+            else score += 10;
+        } else {
+            if (teleopGap >= 30) score += 15;
+            else if (teleopGap >= 15) score += 8;
+        }
+    }
+
+    // WELL-ROUNDED BONUS
+    if (theirStats.auto >= 25 && theirStats.teleop >= 40) {
+        const bothBetter = autoGap > 0 && teleopGap > 0;
+        if (bothBetter) {
+            if (autoGap >= 15 && teleopGap >= 20) score += 20;
+            else if (autoGap >= 10 && teleopGap >= 15) score += 15;
+            else if (autoGap >= 5 && teleopGap >= 10) score += 10;
+        } else {
+            score += 5;
+        }
+    }
+
+    return Math.min(score, 100);
 }
 
-/**
- * DATA FETCHING
- */
+/** ---------------- SIMULATE ALLIANCE SCORES ---------------- */
+function simulateAllianceScore(teams) {
+    return teams.reduce((total, team) => {
+        const autoRand = gaussianRandom() * 0.15;
+        const teleopRand = gaussianRandom() * 0.15;
+        const endgameRand = gaussianRandom() * 0.15;
+        return total + Math.max(0,
+            team.auto * (1 + autoRand) +
+            team.teleop * (1 + teleopRand) +
+            (team.endgame || 0) * (1 + endgameRand)
+        );
+    }, 0);
+}
+
+/** ---------------- WIN PROBABILITY ---------------- */
+function calculateWinProbability(yourStats, candidateStats, allTeams, targetScore, iterations = DEFAULT_MONTE_CARLO_ITER) {
+    let winCount = 0;
+    const opponents = allTeams.filter(t => t.number !== yourStats.number && t.number !== candidateStats.number);
+    const opponentCombos = [];
+
+    for (let i = 0; i < opponents.length; i++) {
+        for (let j = i + 1; j < opponents.length; j++) {
+            opponentCombos.push([opponents[i], opponents[j]]);
+        }
+    }
+
+    opponentCombos.forEach(pair => {
+        for (let k = 0; k < iterations; k++) {
+            const ourScore = simulateAllianceScore([yourStats, candidateStats]);
+            const oppScore = simulateAllianceScore(pair);
+            if (ourScore >= oppScore && ourScore >= targetScore) winCount++;
+        }
+    });
+
+    const totalSims = opponentCombos.length * iterations;
+    return (winCount / totalSims) * 100;
+}
+
+/** ---------------- EVENT WIN % SIMULATION ---------------- */
+function simulateFullEventWin(yourStats, candidateStats, allTeams, targetScore) {
+    // Simple playoff simulation: 8-team single-elimination
+    // For fun only; not part of pick score
+    const teams = allTeams.filter(t => t.number !== yourStats.number);
+    const selectedAlliance = [yourStats, candidateStats];
+    let rounds = Math.ceil(Math.log2(8));
+
+    // Simulate 100 tournaments
+    let wins = 0;
+    for (let t = 0; t < 100; t++) {
+        let aliveAlliances = [];
+
+        // Randomly select 7 other alliances
+        for (let i = 0; i < 7; i++) {
+            aliveAlliances.push([teams[Math.floor(Math.random() * teams.length)], teams[Math.floor(Math.random() * teams.length)]]);
+        }
+        aliveAlliances.push(selectedAlliance); // Add our alliance
+
+        while (aliveAlliances.length > 1) {
+            let nextRound = [];
+            for (let i = 0; i < aliveAlliances.length; i += 2) {
+                const a1 = aliveAlliances[i];
+                const a2 = aliveAlliances[i + 1];
+                if (!a2) { nextRound.push(a1); continue; }
+                const score1 = simulateAllianceScore(a1);
+                const score2 = simulateAllianceScore(a2);
+                nextRound.push(score1 >= score2 ? a1 : a2);
+            }
+            aliveAlliances = nextRound;
+        }
+
+        if (aliveAlliances[0].includes(candidateStats)) wins++;
+    }
+
+    return (wins / 100) * 100;
+}
+
+/** ---------------- LOAD EVENT ---------------- */
 async function loadEvent() {
     const eventCode = document.getElementById('eventCode').value.trim().toUpperCase();
     const yourTeamNum = document.getElementById('yourTeamNumber').value.trim();
     const season = 2025;
 
-    if (!eventCode) {
-        showError('Please enter an event code (e.g., USNYNYBRQ2)');
-        return;
-    }
+    if (!eventCode) { showError('Please enter an event code'); return; }
 
     hideError();
     hideResults();
@@ -176,21 +173,15 @@ async function loadEvent() {
 
     const QUERY = `
     query GetEventData($code: String!, $season: Int!) {
-      eventByCode(code: $code, season: $season) {
-        name
-        code
-        teams {
-          teamNumber
-          team {
-            name
-            quickStats(season: $season) {
-              tot { value }
-              auto { value }
-              dc { value }
+        eventByCode(code: $code, season: $season) {
+            name code teams {
+                teamNumber
+                team {
+                    name
+                    quickStats(season: $season) { tot { value } auto { value } dc { value } }
+                }
             }
-          }
         }
-      }
     }`;
 
     try {
@@ -199,15 +190,12 @@ async function loadEvent() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query: QUERY, variables: { code: eventCode, season } })
         });
-
         const result = await response.json();
         const event = result.data?.eventByCode;
-
-        if (!event) throw new Error("Event not found on FTC Scout.");
+        if (!event) throw new Error("Event not found");
 
         currentEvent = { name: event.name, code: event.code };
 
-        // Process Teams
         const teamsData = event.teams.map(t => ({
             number: t.teamNumber,
             name: t.team?.name || "Unknown",
@@ -217,59 +205,51 @@ async function loadEvent() {
             consistency: Math.max(5, 20 - (t.team?.quickStats?.tot?.value * 0.1) + (Math.random() * 5))
         }));
 
-        const yourStats = teamsData.find(t => t.number === parseInt(yourTeamNum)) || 
-                          { auto: 0, teleop: 0, totalOPR: 0, consistency: 15 };
+        const yourStats = teamsData.find(t => t.number === parseInt(yourTeamNum)) || { auto: 0, teleop: 0, totalOPR: 0, consistency: 15, number: parseInt(yourTeamNum) || 0 };
 
-        currentPickList = teamsData
-            .filter(t => t.number !== parseInt(yourTeamNum))
+        // Dynamic target score: mean + std approximation
+        const avgOPR = teamsData.reduce((a,b)=>a+b.totalOPR,0)/teamsData.length;
+        const targetScore = avgOPR * 2; // rough event win target
+
+        currentPickList = teamsData.filter(t => t.number !== parseInt(yourTeamNum))
             .map(team => {
-                const winProb = runMonteCarlo(yourStats, team, 150);
+                const winProb = calculateWinProbability(yourStats, team, teamsData, targetScore);
                 const complementary = calculateComplementary(yourStats, team);
-                
-                // PICK SCORE FORMULA:
-                // 30% OPR + 40% Win Probability + 20% Complementary + 10% Consistency
-                const pickScore = 
-                    (team.totalOPR * 0.3) +              // 30% raw OPR
-                    (winProb * 0.4) +                     // 40% win probability
-                    (complementary * 0.2) +               // 20% complementary (0-100 scale)
-                    ((25 - team.consistency) * 0.5);      // 10% consistency
+                const pickScore = (team.totalOPR * 0.3) + (winProb * 0.4) + (complementary * 0.2) + ((25 - team.consistency) * 0.5);
 
-                return {
-                    ...team,
-                    winProb: winProb,
-                    complementary: complementary,
-                    pickScore: pickScore
-                };
+                const eventWinPercent = simulateFullEventWin(yourStats, team, teamsData, targetScore);
+
+                return { ...team, winProb, complementary, pickScore, eventWinPercent };
             })
-            .sort((a, b) => b.pickScore - a.pickScore)
-            .map((t, i) => ({ ...t, pickOrder: i + 1 }));
+            .sort((a,b)=>b.pickScore - a.pickScore)
+            .map((t,i)=>({ ...t, pickOrder:i+1 }));
 
         displayResults();
-    } catch (err) {
-        showError(err.message);
-    } finally {
-        setLoading(false);
-    }
+
+    } catch(err) { showError(err.message); }
+    finally { setLoading(false); }
 }
 
+/** ---------------- DISPLAY RESULTS ---------------- */
 function displayResults() {
     resultsSection.classList.remove('hidden');
     document.getElementById('eventName').textContent = currentEvent.name;
     document.getElementById('eventCode2').textContent = `Code: ${currentEvent.code}`;
     document.getElementById('teamCount').textContent = `${currentPickList.length} teams found`;
+
     renderTable(currentPickList);
 
-    // Track Google Analytics Event
     if (typeof gtag !== 'undefined') {
         gtag('event', 'picklist_generated', {
-            'event_category': 'engagement',
-            'event_label': 'pick_list_builder',
-            'event_code': currentEvent.code,
-            'team_count': currentPickList.length
+            'event_category':'engagement',
+            'event_label':'pick_list_builder',
+            'event_code':currentEvent.code,
+            'team_count':currentPickList.length
         });
     }
 }
 
+/** ---------------- RENDER TABLE ---------------- */
 function renderTable(list) {
     const tbody = document.getElementById('pickListBody');
     tbody.innerHTML = '';
@@ -277,24 +257,24 @@ function renderTable(list) {
     list.forEach((team, index) => {
         const row = document.createElement('tr');
         row.className = 'pick-list-row';
-        
+
         // Pick Score color coding
         let scoreClass = 'tier-c';
         if (team.pickScore > 75) scoreClass = 'tier-s';
         else if (team.pickScore > 60) scoreClass = 'tier-a';
         else if (team.pickScore > 45) scoreClass = 'tier-b';
 
-        // Complementary color coding (0-100 scale)
+        // Complementary color coding
         let compClass = '';
-        if (team.complementary >= 60) compClass = 'tier-s';      // Gold
-        else if (team.complementary >= 40) compClass = 'tier-a'; // Blue
-        else if (team.complementary >= 20) compClass = 'tier-b'; // Green
-        else compClass = 'tier-c';                               // Gray
+        if (team.complementary >= 60) compClass = 'tier-s';
+        else if (team.complementary >= 40) compClass = 'tier-a';
+        else if (team.complementary >= 20) compClass = 'tier-b';
+        else compClass = 'tier-c';
 
         row.innerHTML = `
             <td class="pick-order">#${index + 1}</td>
             <td><strong>${team.number}</strong><br><small>${team.name}</small></td>
-            <td>-</td>
+            <td><strong>${team.eventWinPercent !== undefined ? team.eventWinPercent.toFixed(0) + '%' : '—'}</strong></td>
             <td class="pick-score ${scoreClass}"><strong>${team.pickScore.toFixed(1)}</strong></td>
             <td>${team.totalOPR.toFixed(1)}</td>
             <td>${team.auto.toFixed(1)}</td>
@@ -302,54 +282,38 @@ function renderTable(list) {
             <td class="${compClass}"><strong>${team.complementary.toFixed(0)}</strong></td>
             <td>${team.consistency.toFixed(1)}</td>
             <td>
-                <button class="btn-small" onclick="window.open('https://ftcscout.org/teams/${team.number}', '_blank')">
-                    Stats
-                </button>
+                <button class="btn-small" onclick="window.open('https://ftcscout.org/teams/${team.number}','_blank')">Stats</button>
             </td>
         `;
+
         tbody.appendChild(row);
     });
 }
 
-/**
- * FILTERS AND SORTING - FIXED!
- */
+
+/** ---------------- FILTERS ---------------- */
 function applyFiltersAndSort() {
     const sortBy = document.getElementById('sortBy').value;
     const minOPR = parseFloat(document.getElementById('minOPR').value) || 0;
     const strengthFilter = document.getElementById('strengthFilter').value;
 
-    // 1. Filter the list
     let filtered = currentPickList.filter(team => {
-        // Minimum OPR Check
         if (team.totalOPR < minOPR) return false;
-
-        // Strength Specialist Check - FIXED!
-        if (strengthFilter === 'auto') {
-            // Must be >40% auto AND have at least 25 auto OPR
-            return (team.auto / team.totalOPR > 0.4) && team.auto >= 25;
-        }
-        if (strengthFilter === 'teleop') {
-            // Must be >60% teleop AND have at least 40 teleop OPR
-            return (team.teleop / team.totalOPR > 0.6) && team.teleop >= 40;
-        }
-        if (strengthFilter === 'consistent') {
-            // Must be consistent AND have decent OPR
-            return team.consistency < 15 && team.totalOPR >= 30;
-        }
-        
+        if (strengthFilter==='auto') return (team.auto / team.totalOPR > 0.4) && team.auto >= 25;
+        if (strengthFilter==='teleop') return (team.teleop / team.totalOPR > 0.6) && team.teleop >= 40;
+        if (strengthFilter==='consistent') return team.consistency<15 && team.totalOPR>=30;
         return true;
     });
 
-    // 2. Sort the filtered list
-    filtered.sort((a, b) => {
-        switch(sortBy) {
+    filtered.sort((a,b)=>{
+        switch(sortBy){
             case 'opr': return b.totalOPR - a.totalOPR;
             case 'autoOPR': return b.auto - a.auto;
             case 'dcOPR': return b.teleop - a.teleop;
             case 'consistency': return a.consistency - b.consistency;
             case 'winRate': return b.winProb - a.winProb;
             case 'complementary': return b.complementary - a.complementary;
+            case 'rank': return a.pickOrder - b.pickOrder;
             default: return b.pickScore - a.pickScore;
         }
     });
@@ -357,32 +321,27 @@ function applyFiltersAndSort() {
     renderTable(filtered);
 }
 
-/**
- * UI STATE HELPERS
- */
+/** ---------------- UI HELPERS ---------------- */
 function setLoading(isLoading) {
     loadEventBtn.disabled = isLoading;
     loadBtnText.textContent = isLoading ? 'Analyzing Event Data...' : 'Load Event & Generate Pick List';
     loadBtnLoader.classList.toggle('hidden', !isLoading);
 }
 
-function showError(msg) {
-    errorMessage.textContent = msg;
-    errorPanel.classList.remove('hidden');
-}
-
+function showError(msg) { errorMessage.textContent=msg; errorPanel.classList.remove('hidden'); }
 function hideError() { errorPanel.classList.add('hidden'); }
 function hideResults() { resultsSection.classList.add('hidden'); }
 
+/** ---------------- EXPORT CSV ---------------- */
 function exportPickList() {
-    let csv = "Rank,Team,PickScore,OPR,Auto,Teleop,Complementary,Consistency\n";
-    currentPickList.forEach((t, i) => {
-        csv += `${i+1},${t.number},${t.pickScore.toFixed(1)},${t.totalOPR.toFixed(1)},${t.auto.toFixed(1)},${t.teleop.toFixed(1)},${t.complementary.toFixed(0)},${t.consistency.toFixed(1)}\n`;
+    let csv = "Rank,Team,PickScore,OPR,Auto,Teleop,Complementary,Consistency,EventWin%\n";
+    currentPickList.forEach((t,i)=>{
+        csv+=`${i+1},${t.number},${t.pickScore.toFixed(1)},${t.totalOPR.toFixed(1)},${t.auto.toFixed(1)},${t.teleop.toFixed(1)},${t.complementary.toFixed(0)},${t.consistency.toFixed(1)},${t.eventWinPercent.toFixed(0)}\n`;
     });
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob([csv],{type:'text/csv'});
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `FTC_Picklist_${currentEvent.code}.csv`;
+    a.href=url;
+    a.download=`FTC_Picklist_${currentEvent.code}.csv`;
     a.click();
 }
