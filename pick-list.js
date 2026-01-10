@@ -1,10 +1,11 @@
 /**
- * FTC Picklist Builder - Phase 4 (Full Tournament Monte Carlo + Event Win %)
+ * FTC Picklist Builder - Phase 4 (Full Tournament Monte Carlo + Event Win % with All Alliances)
  */
 
 // Configuration
 const FTCSCOUT_URL = 'https://api.ftcscout.org/graphql';
 const DEFAULT_MONTE_CARLO_ITER = 500;
+const EVENT_SIM_ITER = 100; // Number of tournaments to simulate
 
 // State
 let currentPickList = [];
@@ -42,7 +43,6 @@ function calculateComplementary(yourStats, theirStats) {
     const autoGap = theirStats.auto - yourStats.auto;
     const teleopGap = theirStats.teleop - yourStats.teleop;
 
-    // AUTO
     if (autoGap > 0 && theirStats.auto >= 20) {
         if (yourStats.auto < 20) {
             if (autoGap >= 30) score += 40;
@@ -55,7 +55,6 @@ function calculateComplementary(yourStats, theirStats) {
         }
     }
 
-    // TELEOP
     if (teleopGap > 0 && theirStats.teleop >= 35) {
         if (yourStats.teleop < 40) {
             if (teleopGap >= 40) score += 40;
@@ -68,7 +67,6 @@ function calculateComplementary(yourStats, theirStats) {
         }
     }
 
-    // WELL-ROUNDED BONUS
     if (theirStats.auto >= 25 && theirStats.teleop >= 40) {
         const bothBetter = autoGap > 0 && teleopGap > 0;
         if (bothBetter) {
@@ -121,42 +119,57 @@ function calculateWinProbability(yourStats, candidateStats, allTeams, targetScor
     return (winCount / totalSims) * 100;
 }
 
-/** ---------------- EVENT WIN % SIMULATION ---------------- */
-function simulateFullEventWin(yourStats, candidateStats, allTeams, targetScore) {
-    // Simple playoff simulation: 8-team single-elimination
-    // For fun only; not part of pick score
-    const teams = allTeams.filter(t => t.number !== yourStats.number);
-    const selectedAlliance = [yourStats, candidateStats];
-    let rounds = Math.ceil(Math.log2(8));
-
-    // Simulate 100 tournaments
-    let wins = 0;
-    for (let t = 0; t < 100; t++) {
-        let aliveAlliances = [];
-
-        // Randomly select 7 other alliances
-        for (let i = 0; i < 7; i++) {
-            aliveAlliances.push([teams[Math.floor(Math.random() * teams.length)], teams[Math.floor(Math.random() * teams.length)]]);
+/** ---------------- ALL POSSIBLE ALLIANCES ---------------- */
+function getAllAlliances(teams) {
+    const alliances = [];
+    for (let i = 0; i < teams.length; i++) {
+        for (let j = i + 1; j < teams.length; j++) {
+            alliances.push([teams[i], teams[j]]);
         }
-        aliveAlliances.push(selectedAlliance); // Add our alliance
+    }
+    return alliances;
+}
 
-        while (aliveAlliances.length > 1) {
-            let nextRound = [];
-            for (let i = 0; i < aliveAlliances.length; i += 2) {
-                const a1 = aliveAlliances[i];
-                const a2 = aliveAlliances[i + 1];
+/** ---------------- EVENT WIN % SIMULATION (ALL ALLIANCES + Monte Carlo Tournaments) ---------------- */
+function simulateFullEventWin(yourStats, candidateStats, allTeams) {
+    const teams = allTeams.filter(t => t.number !== yourStats.number && t.number !== candidateStats.number);
+    const selectedAlliance = [yourStats, candidateStats];
+    const allAlliances = getAllAlliances(teams);
+
+    let wins = 0;
+
+    for (let t = 0; t < EVENT_SIM_ITER; t++) {
+        // Pick 7 unique random alliances for tournament + our alliance
+        const aliveAlliances = [selectedAlliance];
+        const usedIndices = new Set();
+
+        while (aliveAlliances.length < 8 && usedIndices.size < allAlliances.length) {
+            const idx = Math.floor(Math.random() * allAlliances.length);
+            if (!usedIndices.has(idx)) {
+                aliveAlliances.push(allAlliances[idx]);
+                usedIndices.add(idx);
+            }
+        }
+
+        // Play single-elimination tournament
+        let round = aliveAlliances;
+        while (round.length > 1) {
+            const nextRound = [];
+            for (let i = 0; i < round.length; i += 2) {
+                const a1 = round[i];
+                const a2 = round[i + 1];
                 if (!a2) { nextRound.push(a1); continue; }
                 const score1 = simulateAllianceScore(a1);
                 const score2 = simulateAllianceScore(a2);
                 nextRound.push(score1 >= score2 ? a1 : a2);
             }
-            aliveAlliances = nextRound;
+            round = nextRound;
         }
 
-        if (aliveAlliances[0].includes(candidateStats)) wins++;
+        if (round[0].includes(candidateStats)) wins++;
     }
 
-    return (wins / 100) * 100;
+    return (wins / EVENT_SIM_ITER) * 100;
 }
 
 /** ---------------- LOAD EVENT ---------------- */
@@ -207,18 +220,15 @@ async function loadEvent() {
 
         const yourStats = teamsData.find(t => t.number === parseInt(yourTeamNum)) || { auto: 0, teleop: 0, totalOPR: 0, consistency: 15, number: parseInt(yourTeamNum) || 0 };
 
-        // Dynamic target score: mean + std approximation
         const avgOPR = teamsData.reduce((a,b)=>a+b.totalOPR,0)/teamsData.length;
-        const targetScore = avgOPR * 2; // rough event win target
+        const targetScore = avgOPR * 2;
 
         currentPickList = teamsData.filter(t => t.number !== parseInt(yourTeamNum))
             .map(team => {
                 const winProb = calculateWinProbability(yourStats, team, teamsData, targetScore);
                 const complementary = calculateComplementary(yourStats, team);
                 const pickScore = (team.totalOPR * 0.3) + (winProb * 0.4) + (complementary * 0.2) + ((25 - team.consistency) * 0.5);
-
-                const eventWinPercent = simulateFullEventWin(yourStats, team, teamsData, targetScore);
-
+                const eventWinPercent = simulateFullEventWin(yourStats, team, teamsData);
                 return { ...team, winProb, complementary, pickScore, eventWinPercent };
             })
             .sort((a,b)=>b.pickScore - a.pickScore)
@@ -229,6 +239,10 @@ async function loadEvent() {
     } catch(err) { showError(err.message); }
     finally { setLoading(false); }
 }
+
+/** ---------------- DISPLAY, FILTERS, EXPORT ---------------- */
+// (same as your previous code, no changes needed)
+
 
 /** ---------------- DISPLAY RESULTS ---------------- */
 function displayResults() {
