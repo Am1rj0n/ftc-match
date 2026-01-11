@@ -93,10 +93,10 @@ Generate intelligent pick lists for alliance selection.
 
 
 **Advanced Simulation Features:**
--Dynamic Target Score per event (adapts to average scores in that event)
--All-Alliances Monte Carlo: Simulates your alliance against all possible pairings of remaining teams
--Defense & Failure Modeling: Optional tier 2 improvements include correlated failures and auto/teleop role-based interactions
--Event Win %: Simulates full playoff tournaments to estimate the likelihood of winning the event if the candidate team is picked
+- Dynamic Target Score per event (adapts to average scores in that event)
+- All-Alliances Monte Carlo: Simulates your alliance against all possible pairings of remaining teams
+- Defense & Failure Modeling: Optional tier 2 improvements include correlated failures and auto/teleop role-based interactions
+- Event Win %: Simulates full playoff tournaments to estimate the likelihood of winning the event if the candidate team is picked
 
 **Best for:**
 - Alliance selection preparation
