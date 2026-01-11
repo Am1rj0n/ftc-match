@@ -83,10 +83,13 @@ Generate intelligent pick lists for alliance selection.
 - 10% Consistency - Lower variance = more reliable
 
 **Complementary Scoring:**
--Auto & Teleop gaps are compared between your team and the candidate
--Bigger gaps where your team is weak = more complementary points
--Well rounded teams (strong in both auto and teleop) get a bonus
--Teams below minimum thresholds in OPR are penalized (too weak to be valuable)
+- Auto & Teleop gaps are compared between your team and the candidate
+- Bigger gaps where your team is weak = more complementary points
+- Well rounded teams (strong in both auto and teleop) get a bonus
+- Teams below minimum thresholds in OPR are penalized (too weak to be valuable)
+
+**Event Win %**
+- Runs 100 simulations of entire tournament in event with your candidate and alliance with every other possible alliance and comes up with how many % if those won the tournament. 7% = 7 instances.
 
 
 **Advanced Simulation Features:**
