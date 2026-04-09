@@ -140,8 +140,14 @@ Generate intelligent pick lists for alliance selection.
 
 ---
 
+## ⚖️ Privacy & Ethics
+- **Data Policy:** All data is publicly available through the FTC Scout API. No personal information is collected, stored, or transmitted by this toolkit.
+- **Usage:** This tool is intended for educational and strategic use by FIRST Tech Challenge teams. It is not for commercial use or gambling.
+- **Gracious Professionalism:** We encourage teams to use this data to improve their own strategies and support their partners, in the spirit of Gracious Professionalism® and Coopertition™.
 
-## Troubleshooting
+---
+
+## 🛠️ Troubleshooting
 
 **"Team not found" error:**
 - Check team number is correct
