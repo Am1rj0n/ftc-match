@@ -764,6 +764,18 @@ body::before {
     margin-bottom: 24px;
 }
 
+@media (max-width: 640px) {
+    .percentile-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .percentile-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 .percentile-card {
     background: rgba(30, 41, 59, 0.4);
     border: 1px solid rgba(99, 102, 241, 0.1);
@@ -1599,6 +1611,37 @@ body::before {
         height: 20px;
     }
 
+    /* Improved Touch Targets & Spacing */
+    .nav-link {
+        padding: 10px 8px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary, .btn-secondary {
+        min-height: 48px;
+    }
+
+    /* Prevent text overflow in score displays */
+    .prob-value {
+        font-size: 32px;
+    }
+
+    .score-main {
+        font-size: 28px;
+    }
+
+    /* Grid adjustments */
+    .confidence-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .result-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
     .input-panel,
     .config-panel {
         padding: 20px;
@@ -1619,7 +1662,7 @@ body::before {
     .pick-list-table th,
     .pick-list-table td {
         padding: 10px 12px;
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .section-title {
@@ -1627,6 +1670,7 @@ body::before {
     }
 }
 
+/* Extra small devices */
 @media (max-width: 480px) {
     .percentile-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1643,6 +1687,21 @@ body::before {
     .icon-large {
         width: 30px;
         height: 30px;
+    }
+}
+
+@media (max-width: 380px) {
+    .nav-link {
+        font-size: 10px;
+        padding: 8px 4px;
+    }
+    
+    .nav-title {
+        font-size: 16px;
+    }
+    
+    .prob-value {
+        font-size: 28px;
     }
 }
 

@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
     <!-- SEO Meta Tags -->
-    <meta name="description" content="FTC Match Predictor - Predict match outcomes using Monte Carlo simulations. Compare alliances and analyze win probabilities for FIRST Tech Challenge competitions. Created by Rolling Drones 10392.">
+    <meta name="description" content="FTC Match Predictor - Predict match outcomes using Monte Carlo simulations. Compare alliances, analyze win probabilities, and deep-dive into team statistics for FIRST Tech Challenge. Created by Rolling Drones 10392.">
     <meta name="keywords" content="FTC, match predictor, alliance comparison, win probability, FIRST Tech Challenge, robotics competition,FTC Match, FTC scout, FTC open alliance, ftc scout, ftc open, ftc, frc, ftc opr, rolling drones, 10392 rolling drones">
     <meta name="author" content="Rolling Drones 10392">
+    <meta name="theme-color" content="#080b15">
+    <link rel="canonical" href="https://ftcmatch.com/match-predictor.html">
     
     <!-- OpenGraph / Social Media Meta Tags -->
     <meta property="og:title" content="FTC Match Predictor">
-    <meta property="og:description" content="Predict FTC match outcomes with advanced statistical analysis. Created by Rolling Drones 10392.">
+    <meta property="og:description" content="Predict FTC match outcomes with advanced statistical analysis. Built for high-stakes competition strategy.">
     <meta property="og:url" content="https://ftcmatch.com/match-predictor.html">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://ftcmatch.com/og-image.png">
@@ -19,9 +21,29 @@
     <meta name="twitter:description" content="Predict FTC match outcomes with advanced statistical analysis. Created by Rolling Drones 10392.">
     <meta name="twitter:image" content="https://ftcmatch.com/og-image.png">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
+    <!-- Favicon & Manifest -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "FTC Match Predictor",
+      "description": "Monte Carlo match predictor for FIRST Tech Challenge teams.",
+      "url": "https://ftcmatch.com/match-predictor.html",
+      "applicationCategory": "Strategic Tool",
+      "operatingSystem": "Web",
+      "author": {
+        "@type": "Organization",
+        "name": "Rolling Drones #10392"
+      }
+    }
+    </script>
     
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PKBYRZ0YVM"></script>
@@ -33,7 +55,7 @@
   gtag('config', 'G-PKBYRZ0YVM');
 </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Match Predictor - FTC Match</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
