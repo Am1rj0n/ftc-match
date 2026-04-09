@@ -232,6 +232,21 @@ The Match Predictor allows you to choose from several advanced statistical model
 - Improved Pick List filtering
 - Enhanced mobile responsiveness
 
+**Version 1.2**
+- Added specialist filters (auto/teleop/consistent)
+- Improved Pick Score algorithm
+- Better error handling
+
+**Version 1.1**
+- Added Match Predictor with insights
+- Enhanced UI/UX
+- Added export functionality
+
+**Version 1.0**
+- Initial release with Alliance Simulator
+- Basic OPR integration
+- Monte Carlo engine
+
 ---
 
 ##  Contributing & Feedback
