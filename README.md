@@ -140,24 +140,6 @@ Generate intelligent pick lists for alliance selection.
 
 ---
 
-## Technical Details
-
-### **Data Source**
-All team statistics come from [FTC Scout](https://ftcscout.org) via their GraphQL API.
-
-### **Simulation Method**
-Uses Monte Carlo simulation with Gaussian (normal) distribution:
-- Each game phase (auto/teleop/endgame) has ±20% variance
-- 10,000 iterations per simulation for statistical accuracy
-- Box-Muller transform for random number generation 
-
-### **Privacy & Ethics**
-- All data is publicly available through FTC Scout
-- No personal information is collected or stored
-- Educational use only - not for gambling or commercial purposes
-- Complies with FIRST's Gracious Professionalism®
-
----
 
 ## Troubleshooting
 
@@ -214,18 +196,20 @@ Track a team's performance across multiple seasons and events.
 
 ---
 
-## Technical Details
+## 🛠️ Statistical Models & Technical Details
 
-### **Data Source**
-All team statistics come from the [FTC Scout](https://ftcscout.org) GraphQL API.
+### **Available Models**
+The Match Predictor allows you to choose from several advanced statistical models:
 
-### **Simulation Method**
-Uses Monte Carlo simulation with Gaussian (normal) distribution:
-- Each game phase (auto/teleop/endgame) has ±20% variance
-- 10,000 iterations per simulation for statistical accuracy
-- Box-Muller transform for random number generation 
+- **🎲 Monte Carlo (Gaussian):** Our flagship model. It runs 10,000 simulations using a Normal (Gaussian) distribution with a ±20% variance across all game phases. It provides the most realistic spread of possible match outcomes.
+- **📊 Poisson Distribution:** Ideal for modeling the frequency of scoring events. It treats each point as an independent event, which can be more accurate for predicting high-variability individual tasks.
+- **🔬 Bayesian Confidence:** This model incorporates "uncertainty." If a team has only played 1-2 matches, the model increases the prediction variance (uncertainty). As more data is gathered, the confidence interval narrows.
+- **⚖️ Weighted Elo Integration:** In Monte Carlo mode, we blend raw OPR data with historical Elo ratings (30% weight) to account for a team's long-term competitive track record beyond just their current season statistics.
 
----
+### **Data & Methodology**
+- **Data Source:** All team statistics come from the [FTC Scout](https://ftcscout.org) GraphQL API.
+- **Simulation Engine:** Written in pure JavaScript using the Box-Muller transform for high-performance Gaussian random number generation.
+- **No Penalty (NP) Analytics:** We prioritize "No Penalty" scores for the 2024 and 2025 seasons to ensure our predictions aren't skewed by outlier matches with heavy foul points.
 
 ## Changelog
 
