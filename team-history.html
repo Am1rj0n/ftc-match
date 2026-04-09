@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team History - FTC Match</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="FTC Team History - Track historical team performance, event statistics, and multi-year progression for the FIRST Tech Challenge. Created by Rolling Drones 10392.">
+    <meta name="keywords" content="FTC, team history, historical data, FIRST Tech Challenge, robotics, OPR tracking, ftcmatch, FTC scout, FTC open alliance, rolling drones, 10392 rolling drones">
+    <meta name="author" content="Rolling Drones 10392">
+    
+    <!-- OpenGraph / Social Media Meta Tags -->
+    <meta property="og:title" content="FTC Match - Team History">
+    <meta property="og:description" content="Track historical team performance, event stats, and multi-year progression. Created by Rolling Drones 10392.">
+    <meta property="og:url" content="https://ftcmatch.com/team-history.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://ftcmatch.com/og-image.png">
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FTC Match - Team History">
+    <meta name="twitter:description" content="Track historical team performance, event stats, and multi-year progression. Created by Rolling Drones 10392.">
+    <meta name="twitter:image" content="https://ftcmatch.com/og-image.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .column-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface-bg);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 24px;
+        }
+
+        .column-header-actions input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .column-header-actions input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .remove-column-btn {
+            background: rgba(255, 69, 58, 0.1);
+            color: var(--accent-red);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .remove-column-btn:hover {
+            background: rgba(255, 69, 58, 0.2);
+        }
+
+        .column-loading-state {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(8, 11, 21, 0.8);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            backdrop-filter: blur(4px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 20px;
+            border: 1px dashed var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+
+    <!-- Navbar injected by nav.js -->
+
+    <!-- Main Content -->
+    <div class="container">
+        <header class="page-header">
+            <h1 class="glow-text">Split-Screen History Engine</h1>
+            <p class="subtitle">Phase 4: Multi-Year Analysis & Event Progression</p>
+        </header>
+
+        <!-- Team Inputs Panel (same glass card container) -->
+        <section class="input-panel">
+            <!-- DASHBOARDS CONTAINER (GRID FOR MULTIPLE TEAMS) -->
+            <div id="dashboardsContainer" class="dashboards-grid">
+                <!-- Dynamic clones of the dashboardTemplate will appear here -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="creator-credit">Created by <strong>Rolling Drones #10392</strong> for the community</p>
+            <p>Data provided by <a href="https://ftcscout.org" target="_blank">FTCScout</a></p>
+            <p>FIRST Tech Challenge® is a registered trademark of <a href="https://www.firstinspires.org" target="_blank">FIRST</a> and is not involved with this service</p>
+            <p class="footer-small">Educational tool • Non-commercial use</p>
+        </footer>
+    </div>
+
+    <!-- TEMPLATE: Single Team Dashboard Column -->
+    <template id="dashboardTemplate">
+        <div class="dashboard-column" style="display: flex; flex-direction: column; gap: 20px; position: relative;">
+            
+            <!-- Live Search Header for this Column -->
+            <div class="column-header-actions" style="flex-direction: column; align-items: stretch; gap: 12px;">
+                <div style="display: flex; gap: 12px; width: 100%;">
+                    <input type="number" class="tmpl-searchInput" placeholder="Enter Team # (e.g., 10392)">
+                    <button class="remove-column-btn tmpl-removeBtn" title="Remove Column">×</button>
+                </div>
+                <button class="btn-secondary tmpl-addBtn" style="padding: 8px; font-size: 14px; display: flex; justify-content: center; width: 100%;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display:inline; margin-right: 8px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Add Team
+                </button>
+            </div>
+
+            <!-- Loader Overlay (Hidden by Default) -->
+            <div class="column-loading-state hidden">
+                <svg class="spinner" viewBox="0 0 24 24" style="width: 40px; height: 40px; margin-bottom: 16px;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle></svg>
+                <div style="font-weight: 600; color: var(--accent-blue);">Fetching Data...</div>
+            </div>
+
+            <!-- Empty State (Shown before search) -->
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <p>Enter a team number above to load their isolated analysis dashboard.</p>
+            </div>
+
+            <!-- The Actual Dashboard (Hidden until populated) -->
+            <div class="column-content hidden" style="display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- Error msg -->
+                <div class="tmpl-errorMsg hidden" style="color: var(--accent-red); padding: 12px; background: rgba(255, 69, 58, 0.1); border-radius: 8px; font-size: 14px; text-align: center;"></div>
+
+                <div class="event-info-card" style="text-align: center; padding: 24px;">
+                    <h3 class="tmpl-teamNameDisplay" style="font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">Team Name</h3>
+                    <p style="color: var(--accent-blue-light); font-size: 18px; font-weight: 600;">Team #<span class="tmpl-teamNumberDisplay"></span></p>
+                </div>
+
+                <div class="chart-panel" style="padding: 24px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-subtle);">
+                    <h3 class="section-title" style="font-size: 16px;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        Historical Percentile (Since 2019)
+                    </h3>
+                    <div style="position: relative; height: 280px;">
+                        <canvas class="tmpl-multiYearChart"></canvas>
+                    </div>
+                    <div class="tmpl-noHistoryMsg hidden" style="text-align: center; color: var(--text-muted); padding: 20px;">
+                        Not enough historical data available.
+                    </div>
+                </div>
+
+                <div class="generator-card" style="padding: 24px;">
+                    <h3 class="section-title" style="font-size: 16px; margin-bottom: 24px;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                        Recent Event Progression
+                    </h3>
+                    
+                    <div style="margin-bottom: 24px;">
+                        <select class="filter-select tmpl-seasonFilter" style="width: 100%;">
+                            <option value="2025">2025-2026 (DECODE)</option>
+                            <option value="2024">2024-2025 (INTO THE DEEP)</option>
+                        </select>
+                    </div>
+
+                    <div class="tmpl-progressionChartContainer" style="position: relative; height: 250px; margin-bottom: 24px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 24px;">
+                        <canvas class="tmpl-progressionChart"></canvas>
+                    </div>
+
+                    <div class="tmpl-noEventsMsg hidden" style="text-align: center; color: var(--text-muted);">
+                        No events tracked for this season yet.
+                    </div>
+
+                    <div class="tmpl-pastCompsList" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Event cards injected by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <!-- Global App Scripts -->
+    <script src="nav.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="team-history.js"></script>
+</body>
+</html>

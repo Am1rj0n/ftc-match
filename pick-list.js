@@ -1,11 +1,11 @@
 /**
- * FTC Picklist Builder - Phase 4 (Full Tournament Monte Carlo + Event Win % with All Alliances)
+ * FTC Picklist Builder v2.0
+ * Full Tournament Monte Carlo + Event Win % + Elo Ratings
  */
 
 // Configuration
 const FTCSCOUT_URL = 'https://api.ftcscout.org/graphql';
 const DEFAULT_MONTE_CARLO_ITER = 500;
-const EVENT_SIM_ITER = 100; // Number of tournaments to simulate
 
 // State
 let currentPickList = [];
@@ -26,7 +26,7 @@ loadEventBtn.addEventListener('click', loadEvent);
 if (exportBtn) exportBtn.addEventListener('click', exportPickList);
 if (applyFiltersBtn) applyFiltersBtn.addEventListener('click', applyFiltersAndSort);
 
-/** ---------------- MATH UTILITIES ---------------- */
+/** ─── MATH UTILITIES ─── */
 function gaussianRandom() {
     let u = 0, v = 0;
     while(u === 0) u = Math.random();
@@ -34,7 +34,24 @@ function gaussianRandom() {
     return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
-/** ---------------- COMPLEMENTARY SCORING ---------------- */
+/** ─── ELO RATING ─── */
+function calculateElo(teamData) {
+    const BASE_ELO = 1500;
+    const totalGames = (teamData.wins || 0) + (teamData.losses || 0) + (teamData.ties || 0);
+
+    if (totalGames === 0) {
+        return BASE_ELO + (teamData.totalOPR - 60) * 3;
+    }
+
+    const winRate = ((teamData.wins || 0) + (teamData.ties || 0) * 0.5) / totalGames;
+    const oprBonus = (teamData.totalOPR - 60) * 2.5;
+    const winBonus = (winRate - 0.5) * 400;
+    const experienceFactor = Math.min(1, totalGames / 10);
+
+    return Math.round(BASE_ELO + (oprBonus * 0.6 + winBonus * 0.4) * experienceFactor + oprBonus * (1 - experienceFactor));
+}
+
+/** ─── COMPLEMENTARY SCORING ─── */
 function calculateComplementary(yourStats, theirStats) {
     let score = 0;
     if (!yourStats || !theirStats || theirStats.totalOPR === 0) return 0;
@@ -81,7 +98,7 @@ function calculateComplementary(yourStats, theirStats) {
     return Math.min(score, 100);
 }
 
-/** ---------------- SIMULATE ALLIANCE SCORES ---------------- */
+/** ─── SIMULATE ALLIANCE SCORES ─── */
 function simulateAllianceScore(teams) {
     return teams.reduce((total, team) => {
         const autoRand = gaussianRandom() * 0.15;
@@ -95,7 +112,7 @@ function simulateAllianceScore(teams) {
     }, 0);
 }
 
-/** ---------------- WIN PROBABILITY ---------------- */
+/** ─── WIN PROBABILITY ─── */
 function calculateWinProbability(yourStats, candidateStats, allTeams, targetScore, iterations = DEFAULT_MONTE_CARLO_ITER) {
     let winCount = 0;
     const opponents = allTeams.filter(t => t.number !== yourStats.number && t.number !== candidateStats.number);
@@ -119,20 +136,8 @@ function calculateWinProbability(yourStats, candidateStats, allTeams, targetScor
     return (winCount / totalSims) * 100;
 }
 
-/** ---------------- ALL POSSIBLE ALLIANCES ---------------- */
-function getAllAlliances(teams) {
-    const alliances = [];
-    for (let i = 0; i < teams.length; i++) {
-        for (let j = i + 1; j < teams.length; j++) {
-            alliances.push([teams[i], teams[j]]);
-        }
-    }
-    return alliances;
-}
-
-/** ---------------- FULL EVENT WIN % SIMULATION (All Alliances Exhaustive) ---------------- */
+/** ─── FULL EVENT WIN % SIMULATION ─── */
 function simulateFullEventWin(yourStats, candidateStats, allTeams) {
-    // Generate all possible 2-team alliances
     const allAlliances = [];
     for (let i = 0; i < allTeams.length; i++) {
         for (let j = i + 1; j < allTeams.length; j++) {
@@ -140,25 +145,17 @@ function simulateFullEventWin(yourStats, candidateStats, allTeams) {
         }
     }
 
-    // Candidate alliance
     const candidateAlliance = [yourStats, candidateStats];
-
-    // Filter out alliances containing your team
     const opponentAlliances = allAlliances.filter(a => !a.some(t => t.number === yourStats.number));
 
-    // Number of simulations per candidate
     const SIMULATIONS_PER_CANDIDATE = 100;
     let totalWins = 0;
 
     for (let sim = 0; sim < SIMULATIONS_PER_CANDIDATE; sim++) {
-        // Shuffle opponent alliances randomly for this tournament
         const shuffledOpponents = [...opponentAlliances].sort(() => Math.random() - 0.5);
-
-        // Insert candidate alliance at a random position to simulate bracket
         const tournamentAlliances = [...shuffledOpponents];
         tournamentAlliances.splice(Math.floor(Math.random() * (tournamentAlliances.length + 1)), 0, candidateAlliance);
 
-        // Single-elimination tournament simulation
         let aliveAlliances = [...tournamentAlliances];
 
         while (aliveAlliances.length > 1) {
@@ -177,20 +174,31 @@ function simulateFullEventWin(yourStats, candidateStats, allTeams) {
             aliveAlliances = nextRound;
         }
 
-        // Did our candidate alliance win this tournament?
         if (aliveAlliances[0].includes(candidateStats)) totalWins++;
     }
 
-    const totalSimulations = SIMULATIONS_PER_CANDIDATE;
-    return (totalWins / totalSimulations) * 100;
+    return (totalWins / SIMULATIONS_PER_CANDIDATE) * 100;
 }
 
+/** ─── AUTO-DETECT SEASON ─── */
+function getAutoSeason() {
+    const seasonSelect = document.getElementById('plSeasonSelect').value;
+    if (seasonSelect !== 'auto') return parseInt(seasonSelect);
+    
+    // FTC seasons typically start in September
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth(); // 0-indexed
+    // If we're past August, we're in the new season (year = current year)
+    // If we're before September, we're still in the previous season
+    return month >= 8 ? year : year - 1;
+}
 
-/** ---------------- LOAD EVENT ---------------- */
+/** ─── LOAD EVENT ─── */
 async function loadEvent() {
     const eventCode = document.getElementById('eventCode').value.trim().toUpperCase();
     const yourTeamNum = document.getElementById('yourTeamNumber').value.trim();
-    const season = 2025;
+    const season = getAutoSeason();
 
     if (!eventCode) { showError('Please enter an event code'); return; }
 
@@ -205,7 +213,7 @@ async function loadEvent() {
                 teamNumber
                 team {
                     name
-                    quickStats(season: $season) { tot { value } auto { value } dc { value } }
+                    quickStats(season: $season) { tot { value } auto { value } dc { value } eg { value } }
                 }
             }
         }
@@ -219,20 +227,31 @@ async function loadEvent() {
         });
         const result = await response.json();
         const event = result.data?.eventByCode;
-        if (!event) throw new Error("Event not found");
+        if (!event) throw new Error("Event not found. Check event code and season.");
 
         currentEvent = { name: event.name, code: event.code };
 
-        const teamsData = event.teams.map(t => ({
-            number: t.teamNumber,
-            name: t.team?.name || "Unknown",
-            totalOPR: t.team?.quickStats?.tot?.value || 0,
-            auto: t.team?.quickStats?.auto?.value || 0,
-            teleop: t.team?.quickStats?.dc?.value || 0,
-            consistency: Math.max(5, 20 - (t.team?.quickStats?.tot?.value * 0.1) + (Math.random() * 5))
-        }));
+        const teamsData = event.teams.map(t => {
+            const teamData = {
+                number: t.teamNumber,
+                name: t.team?.name || "Unknown",
+                totalOPR: t.team?.quickStats?.tot?.value || 0,
+                auto: t.team?.quickStats?.auto?.value || 0,
+                teleop: t.team?.quickStats?.dc?.value || 0,
+                endgame: t.team?.quickStats?.eg?.value || 0,
+                wins: 0,
+                losses: 0,
+                ties: 0,
+                matchCount: 10,
+                consistency: Math.max(5, 20 - (t.team?.quickStats?.tot?.value * 0.1 || 0) + (Math.random() * 5))
+            };
 
-        const yourStats = teamsData.find(t => t.number === parseInt(yourTeamNum)) || { auto: 0, teleop: 0, totalOPR: 0, consistency: 15, number: parseInt(yourTeamNum) || 0 };
+            teamData.elo = calculateElo(teamData);
+            return teamData;
+        });
+
+        const yourStats = teamsData.find(t => t.number === parseInt(yourTeamNum)) || 
+            { auto: 0, teleop: 0, endgame: 0, totalOPR: 0, consistency: 15, number: parseInt(yourTeamNum) || 0, wins: 0, losses: 0, ties: 0, matchCount: 0 };
 
         const avgOPR = teamsData.reduce((a,b)=>a+b.totalOPR,0)/teamsData.length;
         const targetScore = avgOPR * 2;
@@ -254,11 +273,7 @@ async function loadEvent() {
     finally { setLoading(false); }
 }
 
-/** ---------------- DISPLAY, FILTERS, EXPORT ---------------- */
-// (same as your previous code, no changes needed)
-
-
-/** ---------------- DISPLAY RESULTS ---------------- */
+/** ─── DISPLAY RESULTS ─── */
 function displayResults() {
     resultsSection.classList.remove('hidden');
     document.getElementById('eventName').textContent = currentEvent.name;
@@ -277,7 +292,7 @@ function displayResults() {
     }
 }
 
-/** ---------------- RENDER TABLE ---------------- */
+/** ─── RENDER TABLE ─── */
 function renderTable(list) {
     const tbody = document.getElementById('pickListBody');
     tbody.innerHTML = '';
@@ -293,15 +308,21 @@ function renderTable(list) {
         else if (team.pickScore > 45) scoreClass = 'tier-b';
 
         // Complementary color coding
-        let compClass = '';
+        let compClass = 'tier-c';
         if (team.complementary >= 60) compClass = 'tier-s';
         else if (team.complementary >= 40) compClass = 'tier-a';
         else if (team.complementary >= 20) compClass = 'tier-b';
-        else compClass = 'tier-c';
+
+        // Elo color
+        let eloColor = 'var(--text-secondary)';
+        if (team.elo >= 1650) eloColor = '#fbbf24';
+        else if (team.elo >= 1550) eloColor = '#818cf8';
+        else if (team.elo >= 1450) eloColor = '#34d399';
 
         row.innerHTML = `
             <td class="pick-order">#${index + 1}</td>
-            <td><strong>${team.number}</strong><br><small>${team.name}</small></td>
+            <td><strong>${escapeHTML(team.number)}</strong><br><small style="color: var(--text-muted);">${escapeHTML(team.name)}</small></td>
+            <td style="color: ${eloColor}; font-weight: 700;">${team.elo}</td>
             <td><strong>${team.eventWinPercent !== undefined ? team.eventWinPercent.toFixed(0) + '%' : '—'}</strong></td>
             <td class="pick-score ${scoreClass}"><strong>${team.pickScore.toFixed(1)}</strong></td>
             <td>${team.totalOPR.toFixed(1)}</td>
@@ -318,8 +339,7 @@ function renderTable(list) {
     });
 }
 
-
-/** ---------------- FILTERS ---------------- */
+/** ─── FILTERS ─── */
 function applyFiltersAndSort() {
     const sortBy = document.getElementById('sortBy').value;
     const minOPR = parseFloat(document.getElementById('minOPR').value) || 0;
@@ -336,6 +356,7 @@ function applyFiltersAndSort() {
     filtered.sort((a,b)=>{
         switch(sortBy){
             case 'opr': return b.totalOPR - a.totalOPR;
+            case 'elo': return b.elo - a.elo;
             case 'autoOPR': return b.auto - a.auto;
             case 'dcOPR': return b.teleop - a.teleop;
             case 'consistency': return a.consistency - b.consistency;
@@ -349,7 +370,7 @@ function applyFiltersAndSort() {
     renderTable(filtered);
 }
 
-/** ---------------- UI HELPERS ---------------- */
+/** ─── UI HELPERS ─── */
 function setLoading(isLoading) {
     loadEventBtn.disabled = isLoading;
     loadBtnText.textContent = isLoading ? 'Analyzing Event Data...' : 'Load Event & Generate Pick List';
@@ -360,11 +381,11 @@ function showError(msg) { errorMessage.textContent=msg; errorPanel.classList.rem
 function hideError() { errorPanel.classList.add('hidden'); }
 function hideResults() { resultsSection.classList.add('hidden'); }
 
-/** ---------------- EXPORT CSV ---------------- */
+/** ─── EXPORT CSV ─── */
 function exportPickList() {
-    let csv = "Rank,Team,PickScore,OPR,Auto,Teleop,Complementary,Consistency,EventWin%\n";
+    let csv = "Rank,Team,Elo,PickScore,OPR,Auto,Teleop,Complementary,Consistency,EventWin%\n";
     currentPickList.forEach((t,i)=>{
-        csv+=`${i+1},${t.number},${t.pickScore.toFixed(1)},${t.totalOPR.toFixed(1)},${t.auto.toFixed(1)},${t.teleop.toFixed(1)},${t.complementary.toFixed(0)},${t.consistency.toFixed(1)},${t.eventWinPercent.toFixed(0)}\n`;
+        csv+=`${i+1},${t.number},${t.elo},${t.pickScore.toFixed(1)},${t.totalOPR.toFixed(1)},${t.auto.toFixed(1)},${t.teleop.toFixed(1)},${t.complementary.toFixed(0)},${t.consistency.toFixed(1)},${t.eventWinPercent.toFixed(0)}\n`;
     });
     const blob = new Blob([csv],{type:'text/csv'});
     const url = window.URL.createObjectURL(blob);

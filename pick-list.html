@@ -1,23 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-       <!-- SEO Meta Tags -->
-    <meta name="description" content="FTC Pick List Builder - Generate strategic alliance selection pick lists for FIRST Tech Challenge events using OPR data and performance metrics.">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="FTC Pick List Builder - Generate strategic alliance selection pick lists for FIRST Tech Challenge events using OPR data and performance metrics. Created by Rolling Drones 10392.">
     <meta name="keywords" content="FTC, pick list, alliance selection, team ranking, FIRST Tech Challenge, robotics strategy, FTC Match, FTC scout, FTC open alliance, ftc scout, ftc open, ftc, frc, ftc opr, rolling drones, 10392 rolling drones">
-    <meta name="author" content="Rolling Drones #10392">
+    <meta name="author" content="Rolling Drones 10392">
+    
+    <!-- OpenGraph / Social Media Meta Tags -->
     <meta property="og:title" content="FTC Pick List Builder">
-    <meta property="og:description" content="Build intelligent pick lists for FTC alliance selection">
+    <meta property="og:description" content="Build intelligent pick lists for FTC alliance selection. Created by Rolling Drones 10392.">
     <meta property="og:url" content="https://ftcmatch.com/pick-list.html">
     <meta property="og:type" content="website">
+    <meta property="og:image" content="https://ftcmatch.com/og-image.png">
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FTC Pick List Builder">
+    <meta name="twitter:description" content="Build intelligent pick lists for FTC alliance selection. Created by Rolling Drones 10392.">
+    <meta name="twitter:image" content="https://ftcmatch.com/og-image.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
     
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PKBYRZ0YVM"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  gtag('config', 'G-PKBYRZ0YVM');
+  gtag('config', 'G-PKBYRZ0YVM');
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,17 +39,9 @@
 </head>
 <body data-page="phase3">
     <div class="container">
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                    </svg>
-                    <h1>Pick List Builder</h1>
-                </div>
-                <p class="subtitle">Strategic Alliance Selection Tool</p>
-                <p class="phase-label">Phase 3: Intelligent Team Ranking</p>
-            </div>
+        <header class="page-header">
+            <h1 class="glow-text">Pick List Builder</h1>
+            <p class="subtitle">Phase 3: Strategic Recruitment</p>
         </header>
 
         <!-- Event Selection -->
@@ -59,6 +64,15 @@
                 <div class="input-group">
                     <label for="yourTeamNumber">Your Team (Optional)</label>
                     <input type="number" id="yourTeamNumber" placeholder="10392">
+                </div>
+
+                <div class="input-group">
+                    <label for="plSeasonSelect">Season</label>
+                    <select id="plSeasonSelect">
+                        <option value="auto">Auto-detect</option>
+                        <option value="2025">2025-2026 (DECODE)</option>
+                        <option value="2024">2024-2025 (INTO THE DEEP)</option>
+                    </select>
                 </div>
             </div>
 
@@ -102,15 +116,16 @@
                     <div class="filter-group">
                         <label for="sortBy">Sort By</label>
                         <select id="sortBy" class="filter-select">
-    <option value="pickScore">Pick Score (Recommended)</option>
-    <option value="opr">Total OPR</option>
-    <option value="complementary">Complementary Fit</option>
-    <option value="consistency">Consistency</option>
-    <option value="autoOPR">Auto OPR</option>
-    <option value="dcOPR">TeleOp OPR</option>
-    <option value="winRate">Win Rate</option>
-    <option value="rank">Event Rank</option>
-</select>
+                            <option value="pickScore">Pick Score (Recommended)</option>
+                            <option value="opr">Total OPR</option>
+                            <option value="elo">Elo Rating</option>
+                            <option value="complementary">Complementary Fit</option>
+                            <option value="consistency">Consistency</option>
+                            <option value="autoOPR">Auto OPR</option>
+                            <option value="dcOPR">TeleOp OPR</option>
+                            <option value="winRate">Win Rate</option>
+                            <option value="rank">Event Rank</option>
+                        </select>
                     </div>
 
                     <div class="filter-group">
@@ -159,19 +174,20 @@
                 <div class="table-container">
                     <table class="pick-list-table" id="pickListTable">
                         <thead>
-    <tr>
-        <th>Pick #</th>
-        <th>Team</th>
-       <th>Event Win % with alliance</th>
-        <th>Pick Score</th>
-        <th>Total OPR</th>
-        <th>Auto</th>
-        <th>TeleOp</th>
-        <th>Complement</th>
-        <th>Consistency</th>
-        <th>Actions</th>
-    </tr>
-            </thead>
+                            <tr>
+                                <th>Pick #</th>
+                                <th>Team</th>
+                                <th>Elo</th>
+                                <th>Event Win %</th>
+                                <th>Pick Score</th>
+                                <th>Total OPR</th>
+                                <th>Auto</th>
+                                <th>TeleOp</th>
+                                <th>Complement</th>
+                                <th>Consistency</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody id="pickListBody">
                             <!-- Populated by JS -->
                         </tbody>
@@ -181,19 +197,22 @@
 
             <!-- Legend -->
            <div class="legend-panel">
-    <h4>📊 Metrics Explained</h4>
-    <div class="legend-grid">
-        <div class="legend-item">
-            <strong>Pick Score:</strong> Overall ranking (30% OPR + 40% Win Probability + 20% Complementary Fit + 10% Consistency)
-        </div>
-        <div class="legend-item">
-            <strong>Complementary Fit :</strong> How much better they are than YOU in auto/teleop. Bigger gaps where you're weak = higher score. Teams strong in BOTH get bonus points.
-        </div>
-        <div class="legend-item">
-            <strong>Consistency:</strong> Lower = more predictable. Reliable teams have low standard deviation.
-        </div>
-    </div>
-</div>
+                <h4>📊 Metrics Explained</h4>
+                <div class="legend-grid">
+                    <div class="legend-item">
+                        <strong>Pick Score:</strong> Overall ranking (30% OPR + 40% Win Probability + 20% Complementary Fit + 10% Consistency)
+                    </div>
+                    <div class="legend-item">
+                        <strong>Elo Rating:</strong> Skill rating derived from win/loss record and OPR — higher is better. Based on the chess Elo system.
+                    </div>
+                    <div class="legend-item">
+                        <strong>Complementary Fit:</strong> How much better they are than YOU in auto/teleop. Bigger gaps where you're weak = higher score. Teams strong in BOTH get bonus points.
+                    </div>
+                    <div class="legend-item">
+                        <strong>Consistency:</strong> Lower = more predictable. Reliable teams have low standard deviation.
+                    </div>
+                </div>
+            </div>
        </div>
        
       <!-- Footer -->

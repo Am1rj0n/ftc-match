@@ -1,3 +1,14 @@
+// Global Utilities
+window.escapeHTML = function(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+};
+
 // Shared Navigation Component
 function createNavigation(currentPage) {
     const nav = document.createElement('nav');
@@ -6,7 +17,8 @@ function createNavigation(currentPage) {
     const navItems = [
         { id: 'phase1', label: 'Alliance Simulator', page: 'index.html' },
         { id: 'phase2', label: 'Match Predictor', page: 'match-predictor.html' },
-        { id: 'phase3', label: 'Pick List Builder', page: 'pick-list.html' }
+        { id: 'phase3', label: 'Pick List Builder', page: 'pick-list.html' },
+        { id: 'phase4', label: 'Team History', page: 'team-history.html' }
     ];
     
     nav.innerHTML = `

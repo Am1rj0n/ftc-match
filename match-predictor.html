@@ -1,23 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <!-- SEO Meta Tags -->
-    <meta name="description" content="FTC Match Predictor - Predict match outcomes using Monte Carlo simulations. Compare alliances and analyze win probabilities for FIRST Tech Challenge competitions.">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="FTC Match Predictor - Predict match outcomes using Monte Carlo simulations. Compare alliances and analyze win probabilities for FIRST Tech Challenge competitions. Created by Rolling Drones 10392.">
     <meta name="keywords" content="FTC, match predictor, alliance comparison, win probability, FIRST Tech Challenge, robotics competition,FTC Match, FTC scout, FTC open alliance, ftc scout, ftc open, ftc, frc, ftc opr, rolling drones, 10392 rolling drones">
-    <meta name="author" content="Rolling Drones #10392">
+    <meta name="author" content="Rolling Drones 10392">
+    
+    <!-- OpenGraph / Social Media Meta Tags -->
     <meta property="og:title" content="FTC Match Predictor">
-    <meta property="og:description" content="Predict FTC match outcomes with advanced statistical analysis">
+    <meta property="og:description" content="Predict FTC match outcomes with advanced statistical analysis. Created by Rolling Drones 10392.">
     <meta property="og:url" content="https://ftcmatch.com/match-predictor.html">
     <meta property="og:type" content="website">
+    <meta property="og:image" content="https://ftcmatch.com/og-image.png">
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FTC Match Predictor">
+    <meta name="twitter:description" content="Predict FTC match outcomes with advanced statistical analysis. Created by Rolling Drones 10392.">
+    <meta name="twitter:image" content="https://ftcmatch.com/og-image.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
     
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PKBYRZ0YVM"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  gtag('config', 'G-PKBYRZ0YVM');
+  gtag('config', 'G-PKBYRZ0YVM');
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,20 +41,12 @@
 <body data-page="phase2">
     <div class="container">
         <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline>
-                    </svg>
-                    <h1>Match Predictor</h1>
-                </div>
-                <p class="subtitle">Predict Match Outcomes with Advanced Analysis</p>
-                <p class="phase-label">Phase 2: Match-Specific Predictions</p>
-            </div>
+        <header class="page-header">
+            <h1 class="glow-text">Match Predictor</h1>
+            <p class="subtitle">Phase 2: Match-Specific Predictions</p>
         </header>
 
-        <!-- Alliance Input Panel -->
+        <!-- Your Alliance Input Panel -->
         <section class="input-panel">
             <h2 class="section-title">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -89,12 +94,43 @@
                     <input type="number" id="oppTeam2" placeholder="e.g., 1234">
                 </div>
             </div>
-
-            <button id="predictBtn" class="btn-primary">
-                <span id="btnText">Predict Match Outcome</span>
-                <div id="btnLoader" class="loader hidden"></div>
-            </button>
         </section>
+
+        <!-- Configuration Panel -->
+        <section class="config-panel">
+            <h2 class="section-title">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                Analysis Settings
+            </h2>
+
+            <div class="config-grid">
+                <div class="input-group">
+                    <label for="mpModelSelect">Prediction Model</label>
+                    <select id="mpModelSelect">
+                        <option value="montecarlo">Monte Carlo + Elo</option>
+                        <option value="poisson">Poisson Distribution</option>
+                        <option value="bayesian">Bayesian Confidence</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="mpSeasonSelect">Season</label>
+                    <select id="mpSeasonSelect">
+                        <option value="auto">Auto-detect</option>
+                        <option value="2025">2025-2026 (DECODE)</option>
+                        <option value="2024">2024-2025 (INTO THE DEEP)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <button id="predictBtn" class="btn-primary">
+            <span id="btnText">Predict Match Outcome</span>
+            <div id="btnLoader" class="loader hidden"></div>
+        </button>
 
         <!-- Error Display -->
         <div id="errorPanel" class="error-panel hidden">
@@ -111,6 +147,31 @@
 
         <!-- Results Section -->
         <div id="resultsSection" class="hidden">
+
+            <!-- Active Model Badge -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span class="model-badge" id="mpActiveModelBadge">Monte Carlo + Elo</span>
+            </div>
+
+            <!-- Elo Ratings -->
+            <div class="elo-grid">
+                <div class="elo-card">
+                    <div class="elo-label">Your Alliance Elo</div>
+                    <div class="elo-value" id="yourElo" style="color: var(--accent-green);">--</div>
+                    <div class="elo-label" id="yourRecord">W-L-T</div>
+                </div>
+                <div class="elo-card">
+                    <div class="elo-label">Elo Win Probability</div>
+                    <div class="elo-value" id="eloWinProb" style="color: var(--accent-blue-light);">--</div>
+                    <div class="elo-label">Based on Elo Ratings</div>
+                </div>
+                <div class="elo-card">
+                    <div class="elo-label">Opponent Alliance Elo</div>
+                    <div class="elo-value" id="oppElo" style="color: var(--accent-red);">--</div>
+                    <div class="elo-label" id="oppRecord">W-L-T</div>
+                </div>
+            </div>
+
             <!-- Win Probability Card -->
             <div class="win-prob-card">
                 <h3>Match Prediction</h3>
@@ -170,6 +231,42 @@
                 </div>
             </div>
 
+            <!-- Margin of Victory Distribution -->
+            <div class="margin-panel">
+                <h3 class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M18 20V10"></path>
+                        <path d="M12 20V4"></path>
+                        <path d="M6 20v-6"></path>
+                    </svg>
+                    Margin of Victory Distribution
+                </h3>
+                <div class="metrics-grid" style="margin-bottom: 16px;">
+                    <div class="metric-card metric-green">
+                        <div class="metric-header">
+                            <p class="metric-label">Avg. Margin</p>
+                        </div>
+                        <p class="metric-value" id="avgMargin">-</p>
+                        <p class="metric-subtitle">Points advantage</p>
+                    </div>
+                    <div class="metric-card metric-blue">
+                        <div class="metric-header">
+                            <p class="metric-label">Decisive Margin</p>
+                        </div>
+                        <p class="metric-value" id="blowoutChance">-</p>
+                        <p class="metric-subtitle">> 30 pts margin</p>
+                    </div>
+                    <div class="metric-card metric-purple">
+                        <div class="metric-header">
+                            <p class="metric-label">Close Margin</p>
+                        </div>
+                        <p class="metric-value" id="nailbiterChance">-</p>
+                        <p class="metric-subtitle">< 10 pts margin</p>
+                    </div>
+                </div>
+                <canvas id="marginChart"></canvas>
+            </div>
+
             <!-- Score Distribution Chart -->
             <div class="chart-panel">
                 <h3 class="section-title">Score Distribution Comparison</h3>
@@ -192,7 +289,7 @@
             <!-- Disclaimer -->
             <div class="disclaimer">
                 <p>
-                    <strong>Note:</strong> Predictions are based on historical OPR data and Monte Carlo simulations. 
+                    <strong>Note:</strong> Predictions are based on historical OPR data and statistical simulations. 
                     Actual match outcomes can vary due to strategy, defense, field conditions, driver skill, and other factors.
                     Use as one data point in your match preparation.
                 </p>

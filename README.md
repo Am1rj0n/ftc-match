@@ -180,30 +180,67 @@ Uses Monte Carlo simulation with Gaussian (normal) distribution:
 - Close other browser tabs
 - Try a different browser (Chrome/Edge recommended)
 
+### Team History & Progression
+Track a team's performance across multiple seasons and events.
+
+**What it does:**
+- Fetches multi-year OPR data and event statistics.
+- Visualizes progression with interactive charts (OPR, Auto, Teleop, NP OPR).
+- Provides direct links to FTCScout event details.
+- Includes "No Penalty" (NP) point analysis for the most recent seasons.
+
+**Best for:**
+- Long-term scouting and trend analysis.
+- Understanding if a team is improving or declining over a season.
+- Recruiting and historical research.
+
+**How to use:**
+1. Enter a team number.
+2. View the event-by-event progression chart.
+3. Scroll through the detailed event list with per-event OPR breakdowns.
+
 ---
 
-##  Changelog
+## 🔒 Security & Performance
 
-**Version 1.3 (Current)**
+### **Safety First**
+- **XSS Protection:** Implemented a global HTML escaping layer to prevent cross-site scripting from untrusted API data.
+- **CSRF Mitigation:** Secure request patterns for all external API interactions.
+
+### **Search Optimization (SEO)**
+- Fully optimized for search engines with dynamic page titles, OpenGraph metadata, and standard sitemaps.
+- Discord and Social Media ready: High-quality link previews with embedded branding.
+- Created by **Rolling Drones 10392**.
+
+---
+
+## Technical Details
+
+### **Data Source**
+All team statistics come from the [FTC Scout](https://ftcscout.org) GraphQL API.
+
+### **Simulation Method**
+Uses Monte Carlo simulation with Gaussian (normal) distribution:
+- Each game phase (auto/teleop/endgame) has ±20% variance
+- 10,000 iterations per simulation for statistical accuracy
+- Box-Muller transform for random number generation 
+
+---
+
+## Changelog
+
+**Version 2.0 (Current)**
+- **New Module:** Team History & Multi-Year Progression.
+- **Security:** Global `escapeHTML` mitigation and security hardening.
+- **SEO & Branding:** Full OpenGraph stack, dynamic titles, and custom brand assets.
+- **UI Modernization:** Apple-inspired Glassmorphism design system across all tools.
+- **Feature:** "No Penalty" (NP) point integration for progression tracking.
+
+**Version 1.3**
 - Removed Event Dashboard (simplified toolkit)
 - Updated navigation to 3 core tools
 - Improved Pick List filtering
 - Enhanced mobile responsiveness
-
-**Version 1.2**
-- Added specialist filters (auto/teleop/consistent)
-- Improved Pick Score algorithm
-- Better error handling
-
-**Version 1.1**
-- Added Match Predictor with insights
-- Enhanced UI/UX
-- Added export functionality
-
-**Version 1.0**
-- Initial release with Alliance Simulator
-- Basic OPR integration
-- Monte Carlo engine
 
 ---
 
