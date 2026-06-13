@@ -219,7 +219,12 @@ The Match Predictor allows you to choose from several advanced statistical model
 
 ## Changelog
 
-**Version 2.0 (Current)**
+**Version 2.1 (Current)**
+- **Feature:** Advanced Mode (Custom OPR overrides) added to Alliance Simulator.
+- **UI Modernization:** "Taste-skill" premium design overhaul (Outfit typography, Cobalt & Slate palette, and Framer Motion spring animations).
+- **Bug Fix:** Fixed navigation active states and layout centering.
+
+**Version 2.0**
 - **New Module:** Team History & Multi-Year Progression.
 - **Security:** Global `escapeHTML` mitigation and security hardening.
 - **SEO & Branding:** Full OpenGraph stack, dynamic titles, and custom brand assets.

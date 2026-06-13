@@ -25,6 +25,35 @@ document.querySelectorAll('input').forEach(input => {
     });
 });
 
+const advToggle = document.getElementById('advancedModeToggle');
+const team1AdvInputs = document.getElementById('team1AdvInputs');
+const team2AdvInputs = document.getElementById('team2AdvInputs');
+
+if (advToggle) {
+    advToggle.addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        if (isChecked) {
+            team1AdvInputs.classList.remove('hidden');
+            team2AdvInputs.classList.remove('hidden');
+            if (window.Motion) {
+                Motion.animate([team1AdvInputs, team2AdvInputs], { opacity: [0, 1], height: [0, 'auto'] }, { type: "spring", duration: 0.5, bounce: 0.2 });
+            }
+        } else {
+            if (window.Motion) {
+                Motion.animate([team1AdvInputs, team2AdvInputs], { opacity: [1, 0], height: ['auto', 0] }, { type: "spring", duration: 0.4, bounce: 0 }).finished.then(() => {
+                    if (!advToggle.checked) {
+                        team1AdvInputs.classList.add('hidden');
+                        team2AdvInputs.classList.add('hidden');
+                    }
+                });
+            } else {
+                team1AdvInputs.classList.add('hidden');
+                team2AdvInputs.classList.add('hidden');
+            }
+        }
+    });
+}
+
 // ─── MATH UTILITIES ─────────────────────────────────
 
 // Gaussian random number generator (Box-Muller transform)
@@ -352,6 +381,11 @@ async function runSimulation() {
             fetchTeamData(team2, season)
         ]);
 
+        if (advToggle && advToggle.checked) {
+            applyCustomStats(data1, 'team1');
+            applyCustomStats(data2, 'team2');
+        }
+
         // Run simulation with selected model
         const simulation = runSimulationEngine(data1, data2, targetScore, model, iterations);
 
@@ -534,15 +568,49 @@ function renderHistogram(histogramData, model) {
 
 // ─── UI HELPERS ─────────────────────────────────────
 
+function applyCustomStats(teamObj, prefix) {
+    const autoVal = document.getElementById(`${prefix}AutoInput`)?.value;
+    const teleVal = document.getElementById(`${prefix}TeleInput`)?.value;
+    const endVal = document.getElementById(`${prefix}EndInput`)?.value;
+
+    let overridden = false;
+    if (autoVal !== undefined && autoVal !== '') { teamObj.auto = parseFloat(autoVal); overridden = true; }
+    if (teleVal !== undefined && teleVal !== '') { teamObj.teleop = parseFloat(teleVal); overridden = true; }
+    if (endVal !== undefined && endVal !== '') { teamObj.endgame = parseFloat(endVal); overridden = true; }
+
+    if (overridden) {
+        teamObj.totalOPR = teamObj.auto + teamObj.teleop + teamObj.endgame;
+        if (!teamObj.name.includes('(Custom)')) {
+            teamObj.name += ' (Custom)';
+        }
+    }
+}
+
 function setLoading(isLoading) {
+    const btnContent = document.getElementById('btnContent');
     simulateBtn.disabled = isLoading;
     const iterations = document.getElementById('simCount').value;
-    if (isLoading) {
-        btnText.textContent = `Running ${parseInt(iterations).toLocaleString()} Simulations...`;
-        btnLoader.classList.remove('hidden');
+    
+    if (btnContent) {
+        btnContent.classList.add('transitioning');
+        setTimeout(() => {
+            if (isLoading) {
+                btnText.textContent = `Running ${parseInt(iterations).toLocaleString()} Simulations...`;
+                btnLoader.classList.remove('hidden');
+            } else {
+                btnText.textContent = 'Run Simulation';
+                btnLoader.classList.add('hidden');
+            }
+            btnContent.classList.remove('transitioning');
+        }, 200);
     } else {
-        btnText.textContent = 'Run Simulation';
-        btnLoader.classList.add('hidden');
+        if (isLoading) {
+            btnText.textContent = `Running ${parseInt(iterations).toLocaleString()} Simulations...`;
+            btnLoader.classList.remove('hidden');
+        } else {
+            btnText.textContent = 'Run Simulation';
+            btnLoader.classList.add('hidden');
+        }
     }
 }
 

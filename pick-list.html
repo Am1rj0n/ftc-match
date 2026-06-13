@@ -58,12 +58,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Pick List Builder - FTC Match</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
 </head>
 <body data-page="phase3">
     <div class="container">
         <header class="page-header">
-            <h1 class="glow-text">Pick List Builder</h1>
-            <p class="subtitle">Phase 3: Strategic Recruitment</p>
+            <h1 class="hero-title">Pick List Builder</h1>
+            <p class="subtitle">Data-driven recruitment based on complementary fit and event stats.</p>
         </header>
 
         <!-- Event Selection -->
@@ -99,8 +100,10 @@
             </div>
 
             <button id="loadEventBtn" class="btn-primary">
-                <span id="loadBtnText">Load Event & Generate Pick List</span>
-                <div id="loadBtnLoader" class="loader hidden"></div>
+                <div class="btn-primary-content" id="btnContent" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span id="loadBtnText">Load Event & Generate Pick List</span>
+                    <div id="loadBtnLoader" class="loader hidden"></div>
+                </div>
             </button>
         </section>
 

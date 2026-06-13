@@ -59,8 +59,7 @@
     <title>FTC Match - Alliance Simulator</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-    
+    <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
 </head>
 
 
@@ -68,10 +67,9 @@
 
 <body data-page="phase1">
     <div class="container">
-        <!-- Header -->
         <header class="page-header">
-            <h1 class="glow-text">Alliance Simulator</h1>
-            <p class="subtitle">Phase 1: Alliance Prediction</p>
+            <h1 class="hero-title">Alliance Simulator</h1>
+            <p class="subtitle">Predict match outcomes with advanced Monte Carlo modeling.</p>
         </header>
 
         <!-- Input Panel -->
@@ -99,6 +97,52 @@
                 <div class="input-group">
                     <label for="targetScore">Target Score (optional)</label>
                     <input type="number" id="targetScore" placeholder="e.g., 200" value="200">
+                </div>
+            </div>
+
+            <!-- Advanced Mode Toggle -->
+            <div class="advanced-mode-wrapper" style="margin-top: 20px;">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="advancedModeToggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="toggle-label" style="margin-left: 10px; font-weight: 500; color: var(--text-secondary);">Advanced Mode (Custom OPRs)</span>
+            </div>
+
+            <!-- Custom OPR Inputs -->
+            <div id="team1AdvInputs" class="advanced-inputs hidden" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-subtle);">
+                <h4 style="margin-bottom: 10px; color: var(--accent-blue);">Team 1 Custom OPRs</h4>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Auto</label>
+                        <input type="number" id="team1AutoInput" placeholder="Auto" style="width: 100%;">
+                    </div>
+                    <div class="input-group">
+                        <label>TeleOp</label>
+                        <input type="number" id="team1TeleInput" placeholder="TeleOp" style="width: 100%;">
+                    </div>
+                    <div class="input-group">
+                        <label>Endgame</label>
+                        <input type="number" id="team1EndInput" placeholder="Endgame" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+
+            <div id="team2AdvInputs" class="advanced-inputs hidden" style="margin-top: 15px;">
+                <h4 style="margin-bottom: 10px; color: var(--accent-blue);">Team 2 Custom OPRs</h4>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Auto</label>
+                        <input type="number" id="team2AutoInput" placeholder="Auto" style="width: 100%;">
+                    </div>
+                    <div class="input-group">
+                        <label>TeleOp</label>
+                        <input type="number" id="team2TeleInput" placeholder="TeleOp" style="width: 100%;">
+                    </div>
+                    <div class="input-group">
+                        <label>Endgame</label>
+                        <input type="number" id="team2EndInput" placeholder="Endgame" style="width: 100%;">
+                    </div>
                 </div>
             </div>
         </section>
@@ -144,8 +188,10 @@
         </section>
 
         <button id="simulateBtn" class="btn-primary">
-            <span id="btnText">Run Simulation</span>
-            <div id="btnLoader" class="loader hidden"></div>
+            <div class="btn-primary-content" id="btnContent" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span id="btnText">Run Simulation</span>
+                <div id="btnLoader" class="loader hidden"></div>
+            </div>
         </button>
 
         <!-- Error Display -->

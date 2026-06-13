@@ -372,9 +372,25 @@ function applyFiltersAndSort() {
 
 /** ─── UI HELPERS ─── */
 function setLoading(isLoading) {
+    const btnContent = document.getElementById('btnContent');
     loadEventBtn.disabled = isLoading;
-    loadBtnText.textContent = isLoading ? 'Analyzing Event Data...' : 'Load Event & Generate Pick List';
-    loadBtnLoader.classList.toggle('hidden', !isLoading);
+    
+    if (btnContent) {
+        btnContent.classList.add('transitioning');
+        setTimeout(() => {
+            if (isLoading) {
+                loadBtnText.textContent = 'Analyzing Event Data...';
+                loadBtnLoader.classList.remove('hidden');
+            } else {
+                loadBtnText.textContent = 'Load Event & Generate Pick List';
+                loadBtnLoader.classList.add('hidden');
+            }
+            btnContent.classList.remove('transitioning');
+        }, 200);
+    } else {
+        loadBtnText.textContent = isLoading ? 'Analyzing Event Data...' : 'Load Event & Generate Pick List';
+        loadBtnLoader.classList.toggle('hidden', !isLoading);
+    }
 }
 
 function showError(msg) { errorMessage.textContent=msg; errorPanel.classList.remove('hidden'); }

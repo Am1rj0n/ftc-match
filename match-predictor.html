@@ -59,13 +59,14 @@
     <title>Match Predictor - FTC Match</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
 </head>
 <body data-page="phase2">
     <div class="container">
         <!-- Header -->
         <header class="page-header">
-            <h1 class="glow-text">Match Predictor</h1>
-            <p class="subtitle">Phase 2: Match-Specific Predictions</p>
+            <h1 class="hero-title">Match Predictor</h1>
+            <p class="subtitle">Deep analysis of specific 2v2 match scenarios.</p>
         </header>
 
         <!-- Your Alliance Input Panel -->
@@ -91,6 +92,28 @@
                     <input type="number" id="yourTeam2" placeholder="e.g., 3371">
                 </div>
             </div>
+
+            <!-- Advanced Custom OPRs (Hidden by default) -->
+            <div class="advanced-inputs hidden" id="yourAdvInputs">
+                <div class="input-grid" style="margin-top: 16px;">
+                    <div class="input-group">
+                        <label>Your Team 1 Custom OPR</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="number" id="yourTeam1Auto" placeholder="Auto" style="width: 33%;">
+                            <input type="number" id="yourTeam1Tele" placeholder="TeleOp" style="width: 33%;">
+                            <input type="number" id="yourTeam1End" placeholder="Endgame" style="width: 33%;">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Your Team 2 Custom OPR</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="number" id="yourTeam2Auto" placeholder="Auto" style="width: 33%;">
+                            <input type="number" id="yourTeam2Tele" placeholder="TeleOp" style="width: 33%;">
+                            <input type="number" id="yourTeam2End" placeholder="Endgame" style="width: 33%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- Opponent Alliance Input -->
@@ -114,6 +137,28 @@
                 <div class="input-group">
                     <label for="oppTeam2">Opponent Team 2</label>
                     <input type="number" id="oppTeam2" placeholder="e.g., 1234">
+                </div>
+            </div>
+
+            <!-- Advanced Custom OPRs (Hidden by default) -->
+            <div class="advanced-inputs hidden" id="oppAdvInputs">
+                <div class="input-grid" style="margin-top: 16px;">
+                    <div class="input-group">
+                        <label>Opp Team 1 Custom OPR</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="number" id="oppTeam1Auto" placeholder="Auto" style="width: 33%;">
+                            <input type="number" id="oppTeam1Tele" placeholder="TeleOp" style="width: 33%;">
+                            <input type="number" id="oppTeam1End" placeholder="Endgame" style="width: 33%;">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Opp Team 2 Custom OPR</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="number" id="oppTeam2Auto" placeholder="Auto" style="width: 33%;">
+                            <input type="number" id="oppTeam2Tele" placeholder="TeleOp" style="width: 33%;">
+                            <input type="number" id="oppTeam2End" placeholder="Endgame" style="width: 33%;">
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -146,12 +191,21 @@
                         <option value="2024">2024-2025 (INTO THE DEEP)</option>
                     </select>
                 </div>
+
+                <div class="input-group" style="justify-content: center; align-items: flex-start; padding-top: 10px;">
+                    <label class="toggle-container" style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="checkbox" id="advancedModeToggle" style="width: 18px; height: 18px; cursor: pointer;">
+                        Advanced Mode (Custom OPRs)
+                    </label>
+                </div>
             </div>
         </section>
 
         <button id="predictBtn" class="btn-primary">
-            <span id="btnText">Predict Match Outcome</span>
-            <div id="btnLoader" class="loader hidden"></div>
+            <div class="btn-primary-content" id="btnContent" style="display: flex; align-items: center; gap: 10px;">
+                <span id="btnText">Predict Match Outcome</span>
+                <div id="btnLoader" class="loader hidden"></div>
+            </div>
         </button>
 
         <!-- Error Display -->

@@ -11,6 +11,9 @@ const btnLoader = document.getElementById('btnLoader');
 const errorPanel = document.getElementById('errorPanel');
 const errorMessage = document.getElementById('errorMessage');
 const resultsSection = document.getElementById('resultsSection');
+const advToggle = document.getElementById('advancedModeToggle');
+const yourAdvInputs = document.getElementById('yourAdvInputs');
+const oppAdvInputs = document.getElementById('oppAdvInputs');
 
 // Chart instances
 let comparisonChart = null;
@@ -26,6 +29,31 @@ document.querySelectorAll('input').forEach(input => {
         }
     });
 });
+
+if (advToggle) {
+    advToggle.addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        if (isChecked) {
+            yourAdvInputs.classList.remove('hidden');
+            oppAdvInputs.classList.remove('hidden');
+            if (window.Motion) {
+                Motion.animate([yourAdvInputs, oppAdvInputs], { opacity: [0, 1], height: [0, 'auto'] }, { type: "spring", duration: 0.5, bounce: 0.2 });
+            }
+        } else {
+            if (window.Motion) {
+                Motion.animate([yourAdvInputs, oppAdvInputs], { opacity: [1, 0], height: ['auto', 0] }, { type: "spring", duration: 0.4, bounce: 0 }).finished.then(() => {
+                    if (!advToggle.checked) {
+                        yourAdvInputs.classList.add('hidden');
+                        oppAdvInputs.classList.add('hidden');
+                    }
+                });
+            } else {
+                yourAdvInputs.classList.add('hidden');
+                oppAdvInputs.classList.add('hidden');
+            }
+        }
+    });
+}
 
 // ─── MATH UTILITIES ─────────────────────────────────
 
@@ -257,6 +285,13 @@ async function predictMatch() {
             fetchTeamData(oppTeam1, season),
             fetchTeamData(oppTeam2, season)
         ]);
+
+        if (advToggle && advToggle.checked) {
+            applyCustomStats(yt1, 'yourTeam1');
+            applyCustomStats(yt2, 'yourTeam2');
+            applyCustomStats(ot1, 'oppTeam1');
+            applyCustomStats(ot2, 'oppTeam2');
+        }
 
         // Run simulations for both alliances
         const yourSim = runAllianceSimulation(yt1, yt2, model);
@@ -658,14 +693,49 @@ function generateInsights(data) {
 
 // ─── UI HELPERS ─────────────────────────────────────
 
+function applyCustomStats(teamObj, prefix) {
+    const autoVal = document.getElementById(`${prefix}Auto`)?.value;
+    const teleVal = document.getElementById(`${prefix}Tele`)?.value;
+    const endVal = document.getElementById(`${prefix}End`)?.value;
+
+    let overridden = false;
+    if (autoVal !== undefined && autoVal !== '') { teamObj.auto = parseFloat(autoVal); overridden = true; }
+    if (teleVal !== undefined && teleVal !== '') { teamObj.teleop = parseFloat(teleVal); overridden = true; }
+    if (endVal !== undefined && endVal !== '') { teamObj.endgame = parseFloat(endVal); overridden = true; }
+
+    if (overridden) {
+        teamObj.totalOPR = teamObj.auto + teamObj.teleop + teamObj.endgame;
+        // Adjust display name to indicate custom data
+        if (!teamObj.name.includes('(Custom)')) {
+            teamObj.name += ' (Custom)';
+        }
+    }
+}
+
 function setLoading(isLoading) {
+    const btnContent = document.getElementById('btnContent');
     predictBtn.disabled = isLoading;
-    if (isLoading) {
-        btnText.textContent = 'Analyzing Match...';
-        btnLoader.classList.remove('hidden');
+    
+    if (btnContent) {
+        btnContent.classList.add('transitioning');
+        setTimeout(() => {
+            if (isLoading) {
+                btnText.textContent = 'Analyzing...';
+                btnLoader.classList.remove('hidden');
+            } else {
+                btnText.textContent = 'Predict Match Outcome';
+                btnLoader.classList.add('hidden');
+            }
+            btnContent.classList.remove('transitioning');
+        }, 200);
     } else {
-        btnText.textContent = 'Predict Match Outcome';
-        btnLoader.classList.add('hidden');
+        if (isLoading) {
+            btnText.textContent = 'Analyzing Match...';
+            btnLoader.classList.remove('hidden');
+        } else {
+            btnText.textContent = 'Predict Match Outcome';
+            btnLoader.classList.add('hidden');
+        }
     }
 }
 

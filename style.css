@@ -3,43 +3,43 @@
    Glassmorphism • Gradients • Animations
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
 
 /* ── CSS Custom Properties ── */
 :root {
-    --bg-primary: #080b15;
-    --bg-secondary: #121722;
-    --bg-card: rgba(18, 23, 34, 0.7);
-    --bg-card-solid: #121722;
-    --bg-input: rgba(25, 33, 48, 0.8);
-    --bg-hover: rgba(35, 45, 65, 0.8);
+    --bg-primary: #09090b;
+    --bg-secondary: #18181b;
+    --bg-card: rgba(24, 24, 27, 0.6);
+    --bg-card-solid: #18181b;
+    --bg-input: rgba(39, 39, 42, 0.8);
+    --bg-hover: rgba(63, 63, 70, 0.8);
 
-    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-subtle: rgba(255, 255, 255, 0.06);
     --border-card: rgba(255, 255, 255, 0.1);
     --border-input: rgba(255, 255, 255, 0.12);
-    --border-focus: rgba(10, 132, 255, 0.6);
+    --border-focus: rgba(37, 99, 235, 0.6);
 
-    --text-primary: #f5f5f7;
-    --text-secondary: #86868b;
-    --text-muted: #515154;
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --text-muted: #52525b;
 
-    --accent-blue: #0A84FF;
-    --accent-blue-light: #5E5CE6;
-    --accent-violet: #BF5AF2;
-    --accent-teal: #64D2FF;
-    --accent-green: #30D158;
-    --accent-red: #FF453A;
-    --accent-amber: #FF9F0A;
+    --accent-blue: #2563eb;
+    --accent-blue-light: #3b82f6;
+    --accent-violet: #8b5cf6;
+    --accent-teal: #14b8a6;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --accent-amber: #f59e0b;
 
-    --gradient-primary: linear-gradient(180deg, #1C92FF, #0A84FF);
-    --gradient-blue: linear-gradient(180deg, #1C92FF, #0A84FF);
-    --gradient-green: linear-gradient(180deg, #32D74B, #30D158);
-    --gradient-red: linear-gradient(180deg, #FF5147, #FF453A);
-    --gradient-amber: linear-gradient(180deg, #FFA91A, #FF9F0A);
+    --gradient-primary: linear-gradient(180deg, #3b82f6, #2563eb);
+    --gradient-blue: linear-gradient(180deg, #3b82f6, #2563eb);
+    --gradient-green: linear-gradient(180deg, #34d399, #10b981);
+    --gradient-red: linear-gradient(180deg, #f87171, #ef4444);
+    --gradient-amber: linear-gradient(180deg, #fbbf24, #f59e0b);
 
     --glass-blur: blur(24px);
-    --glass-bg: rgba(18, 23, 34, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(24, 24, 27, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
 
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -52,9 +52,14 @@
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
     --shadow-glow: none;
 
-    --transition-fast: 0.15s ease;
-    --transition-base: 0.25s ease;
-    --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Emil Kowalski Animation Decision Framework */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+    --transition-fast: 0.15s var(--ease-out);
+    --transition-base: 0.25s var(--ease-out);
+    --transition-slow: 0.4s var(--ease-in-out);
 }
 
 /* ── Reset & Base ── */
@@ -65,7 +70,7 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
@@ -85,8 +90,8 @@ body::before {
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse 80% 60% at 50% -20%, rgba(10, 132, 255, 0.08), transparent),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(10, 132, 255, 0.04), transparent);
+        radial-gradient(ellipse 70% 50% at 50% -20%, rgba(37, 99, 235, 0.05), transparent),
+        radial-gradient(ellipse 50% 40% at 80% 100%, rgba(37, 99, 235, 0.03), transparent);
     pointer-events: none;
     z-index: 0;
 }
@@ -146,7 +151,7 @@ body::before {
     border-radius: var(--radius-pill);
     font-weight: 500;
     font-size: 13px;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), color var(--transition-base), transform 160ms var(--ease-out);
     letter-spacing: 0.3px;
 }
 
@@ -170,7 +175,7 @@ body::before {
     width: 34px;
     height: 34px;
     color: var(--text-secondary);
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), transform 160ms var(--ease-out);
     border-radius: 50%;
     margin-left: 8px;
 }
@@ -245,38 +250,43 @@ body::before {
     font-weight: 600;
 }
 
-/* ── Unified Page Header (glow-text style) ── */
+/* ── Unified Page Header ── */
 .page-header {
     text-align: center;
-    padding: 48px 0 36px;
+    padding: 32px 0 48px;
     margin-bottom: 36px;
     border-bottom: 1px solid var(--border-subtle);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.page-header .glow-text {
-    font-size: 48px;
+.page-header .hero-title {
+    font-size: 56px;
     font-weight: 800;
-    letter-spacing: -1px;
-    margin-bottom: 8px;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
     color: var(--text-primary);
-    text-shadow: 0 0 40px rgba(10, 132, 255, 0.12);
+    line-height: 1.1;
 }
 
 .page-header .subtitle {
-    font-size: 18px;
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 400;
     color: var(--text-secondary);
-    opacity: 0.8;
-    text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: -0.2px;
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
+    text-transform: none;
 }
 
 @media (max-width: 768px) {
-    .page-header .glow-text {
-        font-size: 30px;
+    .page-header .hero-title {
+        font-size: 36px;
     }
     .page-header .subtitle {
-        font-size: 14px;
+        font-size: 16px;
     }
 }
 
@@ -429,10 +439,10 @@ body::before {
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Outfit', sans-serif;
     border-radius: var(--radius-sm);
-    transition: all var(--transition-base);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+    transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -463,7 +473,16 @@ body::before {
 }
 
 .btn-primary:active:not(:disabled) {
-    transform: translateY(0);
+    transform: scale(0.97);
+}
+
+.btn-primary-content {
+    transition: filter 200ms ease, opacity 200ms ease;
+}
+
+.btn-primary-content.transitioning {
+    filter: blur(2px);
+    opacity: 0.7;
 }
 
 .btn-primary:disabled {
@@ -484,7 +503,11 @@ body::before {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), transform 160ms var(--ease-out);
+}
+
+.btn-secondary:active {
+    transform: scale(0.97);
 }
 
 .btn-secondary:hover {
@@ -500,8 +523,12 @@ body::before {
     font-weight: 600;
     cursor: pointer;
     border-radius: var(--radius-sm);
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), transform 160ms var(--ease-out);
     font-family: 'Inter', sans-serif;
+}
+
+.btn-small:active {
+    transform: scale(0.97);
 }
 
 .btn-small:hover {
@@ -1481,6 +1508,18 @@ body::before {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* @starting-style pattern for entrance animations */
+.fade-enter {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out);
+
+    @starting-style {
+        opacity: 0;
+        transform: translateY(16px) scale(0.95);
     }
 }
 
